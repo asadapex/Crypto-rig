@@ -24,7 +24,12 @@ let AuthGuard = class AuthGuard {
         const req = context.switchToHttp().getRequest();
         const token = req.headers.authorization?.split(' ')?.[1];
         if (!token) {
-            throw new common_1.UnauthorizedException({ message: 'Token not provided' });
+            throw new common_1.UnauthorizedException({
+                data: [],
+                messages: ['Token not provided'],
+                statusCode: 401,
+                time: new Date(),
+            });
         }
         try {
             const data = this.jwt.verify(token);
@@ -35,7 +40,12 @@ let AuthGuard = class AuthGuard {
             if (error != common_1.UnauthorizedException) {
                 throw error;
             }
-            throw new common_1.UnauthorizedException({ message: 'Wrong credentials' });
+            throw new common_1.UnauthorizedException({
+                data: [],
+                messages: ['Wrong credentials'],
+                statusCode: 401,
+                time: new Date(),
+            });
         }
     }
 };

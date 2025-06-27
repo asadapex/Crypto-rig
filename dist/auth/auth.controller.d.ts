@@ -6,13 +6,30 @@ export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     create(createAuthDto: CreateAuthDto): Promise<{
-        token: string;
+        data: {
+            token: string;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     } | undefined>;
     verify(req: Request, data: VerifyAuthDto): Promise<{
-        message: string;
+        data: {
+            name: string;
+            surname: string;
+            phoneNumber: string;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     } | undefined>;
     login(createAuthDto: CreateAuthDto): Promise<{
-        token: string;
+        data: {
+            token: string;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     } | undefined>;
     findMe(req: Request): Promise<{
         data: {

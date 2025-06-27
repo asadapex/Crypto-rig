@@ -5,11 +5,19 @@ export declare class StoreController {
     private readonly storeService;
     constructor(storeService: StoreService);
     buy(req: Request, dtos: BuyVideoCardDto[]): Promise<{
-        message: string;
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     }>;
     getCards(): Promise<{
-        hashRate: number;
-        price: number;
-        type: string;
-    }[]>;
+        data: {
+            hashRate: number;
+            price: number;
+            type: string;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
 }

@@ -27,7 +27,12 @@ export class AuthService {
   async create(data: CreateAuthDto) {
     const user = await this.findUser(data.email);
     if (user) {
-      throw new BadRequestException({ message: 'User already exists' });
+      throw new BadRequestException({
+        data: [],
+        messages: ['User already exists'],
+        statusCode: 400,
+        time: new Date(),
+      });
     }
 
     try {
@@ -37,7 +42,12 @@ export class AuthService {
       });
 
       const token = this.jwt.sign({ id: user.id });
-      return { token };
+      return {
+        data: [{ token }],
+        messages: ['User registered'],
+        statusCode: 200,
+        time: new Date(),
+      };
     } catch (error) {
       if (error != InternalServerErrorException) {
         throw error;
@@ -52,21 +62,47 @@ export class AuthService {
         where: { id: req['user-id'] },
       });
       if (!user) {
-        throw new NotFoundException({ message: 'User not found' });
+        throw new NotFoundException({
+          data: [],
+          messages: ['User not found'],
+          statusCode: 404,
+          time: new Date(),
+        });
       }
 
       const { name, surname, phoneNumber } = data;
-      if (!name) throw new BadRequestException({ message: 'Name is required' });
+      if (!name)
+        throw new BadRequestException({
+          data: [],
+          messages: ['Name is required'],
+          statusCode: 400,
+          time: new Date(),
+        });
       if (!surname)
-        throw new BadRequestException({ message: 'Surname is required' });
+        throw new BadRequestException({
+          data: [],
+          messages: ['Surname is required'],
+          statusCode: 400,
+          time: new Date(),
+        });
       if (!phoneNumber)
-        throw new BadRequestException({ message: 'Phone number is required' });
+        throw new BadRequestException({
+          data: [],
+          messages: ['Phone number is required'],
+          statusCode: 400,
+          time: new Date(),
+        });
 
       await this.prisma.user.update({
         where: { id: req['user-id'] },
         data: { name, surname, phoneNumber, verified: 1 },
       });
-      return { message: 'Verified' };
+      return {
+        data: [{ name, surname, phoneNumber }],
+        messages: ['User verified'],
+        statusCode: 200,
+        time: new Date(),
+      };
     } catch (err) {
       if (err != InternalServerErrorException) {
         throw err;
@@ -78,17 +114,32 @@ export class AuthService {
   async login(data: CreateAuthDto) {
     const user = await this.findUser(data.email);
     if (!user) {
-      throw new NotFoundException({ message: 'User not found' });
+      throw new NotFoundException({
+        data: [],
+        messages: ['User not found'],
+        statusCode: 404,
+        time: new Date(),
+      });
     }
 
     try {
       const match = bcrypt.compareSync(data.password, user.password);
       if (!match) {
-        throw new BadRequestException({ message: 'Wrong credentials' });
+        throw new BadRequestException({
+          data: [],
+          messages: ['Wrong credentials'],
+          statusCode: 400,
+          time: new Date(),
+        });
       }
 
       const token = this.jwt.sign({ id: user.id });
-      return { token };
+      return {
+        data: [{ token }],
+        messages: ['User logged in'],
+        statusCode: 200,
+        time: new Date(),
+      };
     } catch (error) {
       if (error != InternalServerErrorException) {
         throw error;
@@ -105,11 +156,20 @@ export class AuthService {
       },
     });
 
-    if (!user) throw new NotFoundException({ message: 'User not found' });
+    if (!user)
+      throw new NotFoundException({
+        data: [],
+        messages: ['User not found'],
+        statusCode: 404,
+        time: new Date(),
+      });
 
     if (user.verified === 0) {
       throw new BadRequestException({
-        message: 'User has not verified please verify',
+        data: [],
+        messages: ['User has not verified'],
+        statusCode: 400,
+        time: new Date(),
       });
     }
 

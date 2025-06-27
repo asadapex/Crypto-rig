@@ -4,11 +4,19 @@ export declare class StoreService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     buyCards(userId: string, dtos: BuyVideoCardDto[]): Promise<{
-        message: string;
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     }>;
     getAllVideoCards(): Promise<{
-        hashRate: number;
-        price: number;
-        type: string;
-    }[]>;
+        data: {
+            hashRate: number;
+            price: number;
+            type: string;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
 }

@@ -21,13 +21,30 @@ export declare class AuthService {
         createdAt: Date;
     } | null>;
     create(data: CreateAuthDto): Promise<{
-        token: string;
+        data: {
+            token: string;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     } | undefined>;
     verify(req: Request, data: VerifyAuthDto): Promise<{
-        message: string;
+        data: {
+            name: string;
+            surname: string;
+            phoneNumber: string;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     } | undefined>;
     login(data: CreateAuthDto): Promise<{
-        token: string;
+        data: {
+            token: string;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     } | undefined>;
     findMe(req: Request): Promise<{
         data: {

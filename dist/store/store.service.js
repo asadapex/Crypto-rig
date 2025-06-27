@@ -22,16 +22,29 @@ let StoreService = class StoreService {
     async buyCards(userId, dtos) {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
         if (!user)
-            throw new common_1.NotFoundException({ message: 'User not found' });
+            throw new common_1.NotFoundException({
+                data: [],
+                messages: ['User not found'],
+                statusCode: 404,
+                time: new Date(),
+            });
         if (user.verified === 0) {
             throw new common_1.BadRequestException({
-                message: 'User has not verified please verify',
+                data: [],
+                messages: ['User has not verified'],
+                statusCode: 400,
+                time: new Date(),
             });
         }
         for (const dto of dtos) {
             const videoCardExists = Object.values(client_1.VideoCardType).includes(dto.type);
             if (!videoCardExists) {
-                throw new common_1.NotFoundException(`Video card not found: ${dto.type}`);
+                throw new common_1.NotFoundException({
+                    data: [],
+                    messages: [`Video card not found: ${dto.type}`],
+                    statusCode: 404,
+                    time: new Date(),
+                });
             }
             const createManyData = Array.from({ length: dto.count }).map(() => ({
                 userId,
@@ -41,13 +54,24 @@ let StoreService = class StoreService {
                 data: createManyData,
             });
         }
-        return { message: 'Video cards added' };
+        return {
+            data: [],
+            messages: [`Video cards added`],
+            statusCode: 200,
+            time: new Date(),
+        };
     }
     async getAllVideoCards() {
-        return Object.entries(VideoCardInfo_1.VideoCardInfo).map(([type, info]) => ({
+        const data = Object.entries(VideoCardInfo_1.VideoCardInfo).map(([type, info]) => ({
             type,
             ...info,
         }));
+        return {
+            data,
+            messages: [`Video cards fetched successfully`],
+            statusCode: 200,
+            time: new Date(),
+        };
     }
 };
 exports.StoreService = StoreService;

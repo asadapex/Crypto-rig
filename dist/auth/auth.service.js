@@ -29,7 +29,12 @@ let AuthService = class AuthService {
     async create(data) {
         const user = await this.findUser(data.email);
         if (user) {
-            throw new common_1.BadRequestException({ message: 'User already exists' });
+            throw new common_1.BadRequestException({
+                data: [],
+                messages: ['User already exists'],
+                statusCode: 400,
+                time: new Date(),
+            });
         }
         try {
             const hash = bcrypt.hashSync(data.password, 10);
@@ -37,7 +42,12 @@ let AuthService = class AuthService {
                 data: { ...data, password: hash, status: client_1.UserStatus.ACTIVE },
             });
             const token = this.jwt.sign({ id: user.id });
-            return { token };
+            return {
+                data: [{ token }],
+                messages: ['User registered'],
+                statusCode: 200,
+                time: new Date(),
+            };
         }
         catch (error) {
             if (error != common_1.InternalServerErrorException) {
@@ -52,20 +62,45 @@ let AuthService = class AuthService {
                 where: { id: req['user-id'] },
             });
             if (!user) {
-                throw new common_1.NotFoundException({ message: 'User not found' });
+                throw new common_1.NotFoundException({
+                    data: [],
+                    messages: ['User not found'],
+                    statusCode: 404,
+                    time: new Date(),
+                });
             }
             const { name, surname, phoneNumber } = data;
             if (!name)
-                throw new common_1.BadRequestException({ message: 'Name is required' });
+                throw new common_1.BadRequestException({
+                    data: [],
+                    messages: ['Name is required'],
+                    statusCode: 400,
+                    time: new Date(),
+                });
             if (!surname)
-                throw new common_1.BadRequestException({ message: 'Surname is required' });
+                throw new common_1.BadRequestException({
+                    data: [],
+                    messages: ['Surname is required'],
+                    statusCode: 400,
+                    time: new Date(),
+                });
             if (!phoneNumber)
-                throw new common_1.BadRequestException({ message: 'Phone number is required' });
+                throw new common_1.BadRequestException({
+                    data: [],
+                    messages: ['Phone number is required'],
+                    statusCode: 400,
+                    time: new Date(),
+                });
             await this.prisma.user.update({
                 where: { id: req['user-id'] },
                 data: { name, surname, phoneNumber, verified: 1 },
             });
-            return { message: 'Verified' };
+            return {
+                data: [{ name, surname, phoneNumber }],
+                messages: ['User verified'],
+                statusCode: 200,
+                time: new Date(),
+            };
         }
         catch (err) {
             if (err != common_1.InternalServerErrorException) {
@@ -77,15 +112,30 @@ let AuthService = class AuthService {
     async login(data) {
         const user = await this.findUser(data.email);
         if (!user) {
-            throw new common_1.NotFoundException({ message: 'User not found' });
+            throw new common_1.NotFoundException({
+                data: [],
+                messages: ['User not found'],
+                statusCode: 404,
+                time: new Date(),
+            });
         }
         try {
             const match = bcrypt.compareSync(data.password, user.password);
             if (!match) {
-                throw new common_1.BadRequestException({ message: 'Wrong credentials' });
+                throw new common_1.BadRequestException({
+                    data: [],
+                    messages: ['Wrong credentials'],
+                    statusCode: 400,
+                    time: new Date(),
+                });
             }
             const token = this.jwt.sign({ id: user.id });
-            return { token };
+            return {
+                data: [{ token }],
+                messages: ['User logged in'],
+                statusCode: 200,
+                time: new Date(),
+            };
         }
         catch (error) {
             if (error != common_1.InternalServerErrorException) {
@@ -102,10 +152,18 @@ let AuthService = class AuthService {
             },
         });
         if (!user)
-            throw new common_1.NotFoundException({ message: 'User not found' });
+            throw new common_1.NotFoundException({
+                data: [],
+                messages: ['User not found'],
+                statusCode: 404,
+                time: new Date(),
+            });
         if (user.verified === 0) {
             throw new common_1.BadRequestException({
-                message: 'User has not verified please verify',
+                data: [],
+                messages: ['User has not verified'],
+                statusCode: 400,
+                time: new Date(),
             });
         }
         const data = {

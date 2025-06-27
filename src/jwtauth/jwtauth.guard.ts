@@ -20,7 +20,12 @@ export class AuthGuard implements CanActivate {
     const token = req.headers.authorization?.split(' ')?.[1];
 
     if (!token) {
-      throw new UnauthorizedException({ message: 'Token not provided' });
+      throw new UnauthorizedException({
+        data: [],
+        messages: ['Token not provided'],
+        statusCode: 401,
+        time: new Date(),
+      });
     }
 
     try {
@@ -32,7 +37,12 @@ export class AuthGuard implements CanActivate {
       if (error != UnauthorizedException) {
         throw error;
       }
-      throw new UnauthorizedException({ message: 'Wrong credentials' });
+      throw new UnauthorizedException({
+        data: [],
+        messages: ['Wrong credentials'],
+        statusCode: 401,
+        time: new Date(),
+      });
     }
   }
 }
