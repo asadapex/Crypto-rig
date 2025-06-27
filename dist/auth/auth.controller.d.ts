@@ -15,15 +15,20 @@ export declare class AuthController {
         token: string;
     } | undefined>;
     findMe(req: Request): Promise<{
-        name: string | null;
-        surname: string | null;
-        phoneNumber: string | null;
-        email: string;
-        btc: number;
-        monthlyProfit: number;
-        cards: {
-            type: import(".prisma/client").$Enums.VideoCardType;
-            createdAt: Date;
-        }[];
+        data: {
+            name: string | null;
+            surname: string | null;
+            phoneNumber: string | null;
+            email: string;
+            btc: number;
+            monthlyProfit: number;
+            cards: {
+                type: import(".prisma/client").$Enums.VideoCardType;
+                createdAt: Date;
+            }[];
+        };
+        messages: string[];
+        statusCode: number;
+        time: Date;
     }>;
 }

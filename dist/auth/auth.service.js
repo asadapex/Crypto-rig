@@ -84,11 +84,6 @@ let AuthService = class AuthService {
             if (!match) {
                 throw new common_1.BadRequestException({ message: 'Wrong credentials' });
             }
-            if (user.verified === 0) {
-                throw new common_1.BadRequestException({
-                    message: 'User has not verified please verify',
-                });
-            }
             const token = this.jwt.sign({ id: user.id });
             return { token };
         }
@@ -113,7 +108,7 @@ let AuthService = class AuthService {
                 message: 'User has not verified please verify',
             });
         }
-        return {
+        const data = {
             name: user.name,
             surname: user.surname,
             phoneNumber: user.phoneNumber,
@@ -124,6 +119,12 @@ let AuthService = class AuthService {
                 type: card.type,
                 createdAt: card.createdAt,
             })),
+        };
+        return {
+            data,
+            messages: ['User data fetched successfully'],
+            statusCode: 200,
+            time: new Date(),
         };
     }
 };
