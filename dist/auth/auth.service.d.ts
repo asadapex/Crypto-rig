@@ -57,6 +57,7 @@ export declare class AuthService {
             cards: {
                 type: import(".prisma/client").$Enums.VideoCardType;
                 createdAt: Date;
+                hashRate: number;
             }[];
         };
         messages: string[];

@@ -8,9 +8,10 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
-import { UserStatus } from '@prisma/client';
+import { UserStatus, VideoCardType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { VideoCardInfo } from 'src/VideoCards/VideoCardInfo';
 
 @Injectable()
 export class AuthService {
@@ -171,10 +172,14 @@ export class AuthService {
       email: user.email,
       btc: user.btc,
       monthlyProfit: user.monthlyProfit,
-      cards: user.cards.map((card) => ({
-        type: card.type,
-        createdAt: card.createdAt,
-      })),
+      cards: user.cards.map((card) => {
+        const info = VideoCardInfo[card.type as VideoCardType];
+        return {
+          type: card.type,
+          createdAt: card.createdAt,
+          hashRate: info?.hashRate ?? null,
+        };
+      }),
     };
 
     return {

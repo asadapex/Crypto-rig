@@ -15,6 +15,7 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
 const client_1 = require("@prisma/client");
 const jwt_1 = require("@nestjs/jwt");
+const VideoCardInfo_1 = require("../VideoCards/VideoCardInfo");
 let AuthService = class AuthService {
     prisma;
     jwt;
@@ -158,14 +159,6 @@ let AuthService = class AuthService {
                 statusCode: 404,
                 time: new Date(),
             });
-        if (user.verified === 0) {
-            throw new common_1.BadRequestException({
-                data: [],
-                messages: ['User has not verified'],
-                statusCode: 400,
-                time: new Date(),
-            });
-        }
         const data = {
             name: user.name,
             surname: user.surname,
@@ -173,14 +166,18 @@ let AuthService = class AuthService {
             email: user.email,
             btc: user.btc,
             monthlyProfit: user.monthlyProfit,
-            cards: user.cards.map((card) => ({
-                type: card.type,
-                createdAt: card.createdAt,
-            })),
+            cards: user.cards.map((card) => {
+                const info = VideoCardInfo_1.VideoCardInfo[card.type];
+                return {
+                    type: card.type,
+                    createdAt: card.createdAt,
+                    hashRate: info?.hashRate ?? null,
+                };
+            }),
         };
         return {
             data,
-            messages: ['User data fetched successfully'],
+            messages: [''],
             statusCode: 200,
             time: new Date(),
         };

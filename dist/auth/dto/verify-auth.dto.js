@@ -31,9 +31,6 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({ type: String, example: '+998901234567' }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.Matches)(/^\+998\d{9}$/, {
-        message: 'phoneNumber must be a valid Uzbekistan number starting with +998',
-    }),
     __metadata("design:type", String)
 ], VerifyAuthDto.prototype, "phoneNumber", void 0);
 //# sourceMappingURL=verify-auth.dto.js.map

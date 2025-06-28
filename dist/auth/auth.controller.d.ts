@@ -42,6 +42,7 @@ export declare class AuthController {
             cards: {
                 type: import(".prisma/client").$Enums.VideoCardType;
                 createdAt: Date;
+                hashRate: number;
             }[];
         };
         messages: string[];
