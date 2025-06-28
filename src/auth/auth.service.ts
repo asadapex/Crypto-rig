@@ -164,15 +164,6 @@ export class AuthService {
         time: new Date(),
       });
 
-    if (user.verified === 0) {
-      throw new BadRequestException({
-        data: [],
-        messages: ['User has not verified'],
-        statusCode: 400,
-        time: new Date(),
-      });
-    }
-
     const data = {
       name: user.name,
       surname: user.surname,
@@ -188,7 +179,7 @@ export class AuthService {
 
     return {
       data,
-      messages: ['User data fetched successfully'],
+      messages: [''],
       statusCode: 200,
       time: new Date(),
     };
