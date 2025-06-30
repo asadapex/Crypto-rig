@@ -37,12 +37,13 @@ export declare class AuthController {
             surname: string | null;
             phoneNumber: string | null;
             email: string;
+            verified: number;
             btc: number;
             monthlyProfit: number;
             cards: {
-                type: import(".prisma/client").$Enums.VideoCardType;
+                type: string;
                 createdAt: Date;
-                hashRate: number;
+                hashRate: string;
             }[];
         };
         messages: string[];

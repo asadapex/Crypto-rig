@@ -9,14 +9,4 @@ export declare class StoreService {
         statusCode: number;
         time: Date;
     }>;
-    getAllVideoCards(): Promise<{
-        data: {
-            hashRate: number;
-            price: number;
-            type: string;
-        }[];
-        messages: string[];
-        statusCode: number;
-        time: Date;
-    }>;
 }

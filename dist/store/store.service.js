@@ -12,8 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StoreService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-const client_1 = require("@prisma/client");
-const VideoCardInfo_1 = require("../VideoCards/VideoCardInfo");
 let StoreService = class StoreService {
     prisma;
     constructor(prisma) {
@@ -37,8 +35,12 @@ let StoreService = class StoreService {
             });
         }
         for (const dto of dtos) {
-            const videoCardExists = Object.values(client_1.VideoCardType).includes(dto.type);
-            if (!videoCardExists) {
+            const videoCard = await this.prisma.videoCard.findUnique({
+                where: {
+                    id: dto.type,
+                },
+            });
+            if (!videoCard) {
                 throw new common_1.NotFoundException({
                     data: [],
                     messages: [`Video card not found: ${dto.type}`],
@@ -48,7 +50,7 @@ let StoreService = class StoreService {
             }
             const createManyData = Array.from({ length: dto.count }).map(() => ({
                 userId,
-                type: dto.type,
+                videoCardId: videoCard.id,
             }));
             await this.prisma.userVideoCard.createMany({
                 data: createManyData,
@@ -56,19 +58,7 @@ let StoreService = class StoreService {
         }
         return {
             data: [],
-            messages: [`Video cards added`],
-            statusCode: 200,
-            time: new Date(),
-        };
-    }
-    async getAllVideoCards() {
-        const data = Object.entries(VideoCardInfo_1.VideoCardInfo).map(([type, info]) => ({
-            type,
-            ...info,
-        }));
-        return {
-            data,
-            messages: [`Video cards fetched successfully`],
+            messages: ['Video cards added'],
             statusCode: 200,
             time: new Date(),
         };

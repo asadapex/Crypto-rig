@@ -4,16 +4,18 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { StoreModule } from './store/store.module';
-import { MiningModule } from './mining/mining.module';
+// import { MiningModule } from './mining/mining.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { VideocardModule } from './videocard/videocard.module';
 
 @Module({
   imports: [
     AuthModule,
     PrismaModule,
     StoreModule,
-    MiningModule,
+    // MiningModule,
     ScheduleModule.forRoot(),
+    VideocardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -17,7 +17,6 @@ export declare class AuthService {
         verified: number;
         btc: number;
         monthlyProfit: number;
-        status: import(".prisma/client").$Enums.UserStatus;
         createdAt: Date;
     } | null>;
     create(data: CreateAuthDto): Promise<{
@@ -52,12 +51,13 @@ export declare class AuthService {
             surname: string | null;
             phoneNumber: string | null;
             email: string;
+            verified: number;
             btc: number;
             monthlyProfit: number;
             cards: {
-                type: import(".prisma/client").$Enums.VideoCardType;
+                type: string;
                 createdAt: Date;
-                hashRate: number;
+                hashRate: string;
             }[];
         };
         messages: string[];

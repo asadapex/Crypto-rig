@@ -5,8 +5,6 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BuyVideoCardDto } from './dto/buy-video-card.dto';
-import { VideoCardType } from '@prisma/client';
-import { VideoCardInfo } from 'src/VideoCards/VideoCardInfo';
 
 @Injectable()
 export class StoreService {
@@ -21,6 +19,7 @@ export class StoreService {
         statusCode: 404,
         time: new Date(),
       });
+
     if (user.verified === 0) {
       throw new BadRequestException({
         data: [],
@@ -31,8 +30,13 @@ export class StoreService {
     }
 
     for (const dto of dtos) {
-      const videoCardExists = Object.values(VideoCardType).includes(dto.type);
-      if (!videoCardExists) {
+      const videoCard = await this.prisma.videoCard.findUnique({
+        where: {
+          id: dto.type,
+        },
+      });
+
+      if (!videoCard) {
         throw new NotFoundException({
           data: [],
           messages: [`Video card not found: ${dto.type}`],
@@ -43,7 +47,7 @@ export class StoreService {
 
       const createManyData = Array.from({ length: dto.count }).map(() => ({
         userId,
-        type: dto.type,
+        videoCardId: videoCard.id,
       }));
 
       await this.prisma.userVideoCard.createMany({
@@ -53,21 +57,7 @@ export class StoreService {
 
     return {
       data: [],
-      messages: [`Video cards added`],
-      statusCode: 200,
-      time: new Date(),
-    };
-  }
-
-  async getAllVideoCards() {
-    const data = Object.entries(VideoCardInfo).map(([type, info]) => ({
-      type,
-      ...info,
-    }));
-
-    return {
-      data,
-      messages: [`Video cards fetched successfully`],
+      messages: ['Video cards added'],
       statusCode: 200,
       time: new Date(),
     };

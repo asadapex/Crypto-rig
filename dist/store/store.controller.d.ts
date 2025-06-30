@@ -10,14 +10,4 @@ export declare class StoreController {
         statusCode: number;
         time: Date;
     }>;
-    getCards(): Promise<{
-        data: {
-            hashRate: number;
-            price: number;
-            type: string;
-        }[];
-        messages: string[];
-        statusCode: number;
-        time: Date;
-    }>;
 }

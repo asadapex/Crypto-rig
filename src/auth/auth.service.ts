@@ -8,10 +8,8 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
-import { UserStatus, VideoCardType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { VideoCardInfo } from 'src/VideoCards/VideoCardInfo';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +37,7 @@ export class AuthService {
     try {
       const hash = bcrypt.hashSync(data.password, 10);
       const user = await this.prisma.user.create({
-        data: { ...data, password: hash, status: UserStatus.ACTIVE },
+        data: { ...data, password: hash },
       });
 
       const token = this.jwt.sign({ id: user.id });
@@ -153,7 +151,11 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { id: req['user-id'] },
       include: {
-        cards: true,
+        cards: {
+          include: {
+            videcard: true,
+          },
+        },
       },
     });
 
@@ -170,14 +172,14 @@ export class AuthService {
       surname: user.surname,
       phoneNumber: user.phoneNumber,
       email: user.email,
+      verified: user.verified,
       btc: user.btc,
       monthlyProfit: user.monthlyProfit,
       cards: user.cards.map((card) => {
-        const info = VideoCardInfo[card.type as VideoCardType];
         return {
-          type: card.type,
+          type: `${card.videcard.manufacturer} ${card.videcard.model}`,
           createdAt: card.createdAt,
-          hashRate: info?.hashRate ?? null,
+          hashRate: card.videcard.hashRate,
         };
       }),
     };

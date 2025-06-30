@@ -13,9 +13,7 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
-const client_1 = require("@prisma/client");
 const jwt_1 = require("@nestjs/jwt");
-const VideoCardInfo_1 = require("../VideoCards/VideoCardInfo");
 let AuthService = class AuthService {
     prisma;
     jwt;
@@ -40,7 +38,7 @@ let AuthService = class AuthService {
         try {
             const hash = bcrypt.hashSync(data.password, 10);
             const user = await this.prisma.user.create({
-                data: { ...data, password: hash, status: client_1.UserStatus.ACTIVE },
+                data: { ...data, password: hash },
             });
             const token = this.jwt.sign({ id: user.id });
             return {
@@ -149,7 +147,11 @@ let AuthService = class AuthService {
         const user = await this.prisma.user.findUnique({
             where: { id: req['user-id'] },
             include: {
-                cards: true,
+                cards: {
+                    include: {
+                        videcard: true,
+                    },
+                },
             },
         });
         if (!user)
@@ -164,14 +166,14 @@ let AuthService = class AuthService {
             surname: user.surname,
             phoneNumber: user.phoneNumber,
             email: user.email,
+            verified: user.verified,
             btc: user.btc,
             monthlyProfit: user.monthlyProfit,
             cards: user.cards.map((card) => {
-                const info = VideoCardInfo_1.VideoCardInfo[card.type];
                 return {
-                    type: card.type,
+                    type: `${card.videcard.manufacturer} ${card.videcard.model}`,
                     createdAt: card.createdAt,
-                    hashRate: info?.hashRate ?? null,
+                    hashRate: card.videcard.hashRate,
                 };
             }),
         };

@@ -16,9 +16,4 @@ export class StoreController {
     const userId = req['user-id'];
     return this.storeService.buyCards(userId, dtos);
   }
-
-  @Get('cards')
-  async getCards() {
-    return this.storeService.getAllVideoCards();
-  }
 }

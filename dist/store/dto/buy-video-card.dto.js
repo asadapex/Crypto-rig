@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuyVideoCardDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
 class BuyVideoCardDto {
     type;
@@ -19,8 +18,8 @@ class BuyVideoCardDto {
 }
 exports.BuyVideoCardDto = BuyVideoCardDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ enum: client_1.VideoCardType, example: client_1.VideoCardType.GTX_1660 }),
-    (0, class_validator_1.IsEnum)(client_1.VideoCardType),
+    (0, swagger_1.ApiProperty)({ type: String, example: 'uuid' }),
+    (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], BuyVideoCardDto.prototype, "type", void 0);
 __decorate([

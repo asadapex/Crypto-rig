@@ -27,9 +27,6 @@ let StoreController = class StoreController {
         const userId = req['user-id'];
         return this.storeService.buyCards(userId, dtos);
     }
-    async getCards() {
-        return this.storeService.getAllVideoCards();
-    }
 };
 exports.StoreController = StoreController;
 __decorate([
@@ -42,12 +39,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "buy", null);
-__decorate([
-    (0, common_1.Get)('cards'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], StoreController.prototype, "getCards", null);
 exports.StoreController = StoreController = __decorate([
     (0, common_1.Controller)('store'),
     __metadata("design:paramtypes", [store_service_1.StoreService])

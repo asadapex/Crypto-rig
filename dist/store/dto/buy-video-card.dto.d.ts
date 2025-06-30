@@ -1,5 +1,4 @@
-import { VideoCardType } from '@prisma/client';
 export declare class BuyVideoCardDto {
-    type: VideoCardType;
+    type: string;
     count: number;
 }
