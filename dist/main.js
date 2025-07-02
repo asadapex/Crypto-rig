@@ -17,7 +17,6 @@ async function bootstrap() {
         .setVersion('1.0')
         .addBearerAuth()
         .addSecurityRequirements('bearer', ['bearer'])
-        .addTag('cats')
         .build();
     const documentFactory = () => swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('docs', app, documentFactory);

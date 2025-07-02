@@ -56,9 +56,9 @@ export declare class AuthController {
     statusUpdate(req: Request, data: VdcardStatusDto): Promise<{
         data: {
             id: string;
+            status: import(".prisma/client").$Enums.Status;
             createdAt: Date;
             userId: string;
-            status: import(".prisma/client").$Enums.Status;
             videoCardId: string;
         }[];
         messages: string[];

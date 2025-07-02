@@ -1,0 +1,76 @@
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+export declare class UsersService {
+    private readonly prisma;
+    constructor(prisma: PrismaService);
+    findUser(email: string): Promise<{
+        email: string;
+        password: string;
+        name: string | null;
+        surname: string | null;
+        phoneNumber: string | null;
+        id: string;
+        verified: number;
+        btc: number;
+        monthlyProfit: number;
+        balance: number;
+        createdAt: Date;
+    } | null>;
+    create(data: CreateUserDto): Promise<{
+        data: {
+            email: string;
+            password: string;
+            name: string | null;
+            surname: string | null;
+            phoneNumber: string | null;
+            id: string;
+            verified: number;
+            btc: number;
+            monthlyProfit: number;
+            balance: number;
+            createdAt: Date;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    } | undefined>;
+    findAll(): Promise<{
+        data: {
+            email: string;
+            password: string;
+            name: string | null;
+            surname: string | null;
+            phoneNumber: string | null;
+            id: string;
+            verified: number;
+            btc: number;
+            monthlyProfit: number;
+            balance: number;
+            createdAt: Date;
+        }[];
+        messages: never[];
+        statusCode: number;
+        time: Date;
+    }>;
+    findOne(id: string): Promise<{
+        data: ({
+            email: string;
+            password: string;
+            name: string | null;
+            surname: string | null;
+            phoneNumber: string | null;
+            id: string;
+            verified: number;
+            btc: number;
+            monthlyProfit: number;
+            balance: number;
+            createdAt: Date;
+        } | null)[];
+        messages: never[];
+        statusCode: number;
+        time: Date;
+    }>;
+    update(id: string, updateUserDto: UpdateUserDto): Promise<void>;
+    remove(id: string): Promise<string>;
+}

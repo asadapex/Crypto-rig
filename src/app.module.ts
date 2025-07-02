@@ -7,6 +7,8 @@ import { StoreModule } from './store/store.module';
 // import { MiningModule } from './mining/mining.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { VideocardModule } from './videocard/videocard.module';
+import { UsersModule } from './users/users.module';
+import { MulterModule } from './multer/multer.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { VideocardModule } from './videocard/videocard.module';
     // MiningModule,
     ScheduleModule.forRoot(),
     VideocardModule,
+    UsersModule,
+    MulterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

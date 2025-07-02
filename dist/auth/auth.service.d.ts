@@ -9,15 +9,16 @@ export declare class AuthService {
     private readonly jwt;
     constructor(prisma: PrismaService, jwt: JwtService);
     findUser(email: string): Promise<{
-        id: string;
         email: string;
         password: string;
         name: string | null;
         surname: string | null;
         phoneNumber: string | null;
+        id: string;
         verified: number;
         btc: number;
         monthlyProfit: number;
+        balance: number;
         createdAt: Date;
     } | null>;
     create(data: CreateAuthDto): Promise<{
@@ -70,9 +71,9 @@ export declare class AuthService {
     updateStatus(userId: string, data: VdcardStatusDto): Promise<{
         data: {
             id: string;
+            status: import(".prisma/client").$Enums.Status;
             createdAt: Date;
             userId: string;
-            status: import(".prisma/client").$Enums.Status;
             videoCardId: string;
         }[];
         messages: string[];

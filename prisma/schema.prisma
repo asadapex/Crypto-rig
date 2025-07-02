@@ -23,6 +23,7 @@ model User {
   verified      Int             @default(0)
   btc           Float           @default(0)
   monthlyProfit Float           @default(0)
+  balance       Int             @default(0)
   createdAt     DateTime        @default(now())
 }
 
@@ -38,6 +39,7 @@ model UserVideoCard {
 
 model VideoCard {
   id              String          @id @default(uuid())
+  image           String?
   manufacturer    String
   model           String
   release         Int
