@@ -8,6 +8,7 @@ export declare class VideocardController {
         data: {
             id: string;
             createdAt: Date;
+            image: string | null;
             manufacturer: string;
             model: string;
             release: number;
@@ -30,6 +31,7 @@ export declare class VideocardController {
         data: {
             id: string;
             createdAt: Date;
+            image: string | null;
             manufacturer: string;
             model: string;
             release: number;
@@ -52,6 +54,7 @@ export declare class VideocardController {
         data: {
             id: string;
             createdAt: Date;
+            image: string | null;
             manufacturer: string;
             model: string;
             release: number;
@@ -74,6 +77,7 @@ export declare class VideocardController {
         data: {
             id: string;
             createdAt: Date;
+            image: string | null;
             manufacturer: string;
             model: string;
             release: number;
@@ -96,6 +100,7 @@ export declare class VideocardController {
         data: {
             id: string;
             createdAt: Date;
+            image: string | null;
             manufacturer: string;
             model: string;
             release: number;

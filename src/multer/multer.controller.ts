@@ -43,7 +43,7 @@ export class MulterController {
     }
 
     return {
-      url: `https://dev-api.cryptorig.uz//file/${file.filename}`,
+      url: `https://dev-api.cryptorig.uz/file/${file.filename}`,
     };
   }
 }

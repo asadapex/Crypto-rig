@@ -16,6 +16,7 @@ const store_module_1 = require("./store/store.module");
 const schedule_1 = require("@nestjs/schedule");
 const videocard_module_1 = require("./videocard/videocard.module");
 const users_module_1 = require("./users/users.module");
+const multer_module_1 = require("./multer/multer.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
             schedule_1.ScheduleModule.forRoot(),
             videocard_module_1.VideocardModule,
             users_module_1.UsersModule,
+            multer_module_1.MulterModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
