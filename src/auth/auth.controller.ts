@@ -4,6 +4,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { Request } from 'express';
 import { AuthGuard } from 'src/jwtauth/jwtauth.guard';
+import { VdcardStatusDto } from './dto/vdcard-status.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -29,5 +30,12 @@ export class AuthController {
   @Get('profile')
   findMe(@Req() req: Request) {
     return this.authService.findMe(req);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('status-change')
+  statusUpdate(@Req() req: Request, @Body() data: VdcardStatusDto) {
+    const userId = req['user-id'];
+    return this.authService.updateStatus(userId, data);
   }
 }

@@ -18,6 +18,7 @@ const auth_service_1 = require("./auth.service");
 const create_auth_dto_1 = require("./dto/create-auth.dto");
 const verify_auth_dto_1 = require("./dto/verify-auth.dto");
 const jwtauth_guard_1 = require("../jwtauth/jwtauth.guard");
+const vdcard_status_dto_1 = require("./dto/vdcard-status.dto");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -34,6 +35,10 @@ let AuthController = class AuthController {
     }
     findMe(req) {
         return this.authService.findMe(req);
+    }
+    statusUpdate(req, data) {
+        const userId = req['user-id'];
+        return this.authService.updateStatus(userId, data);
     }
 };
 exports.AuthController = AuthController;
@@ -68,6 +73,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "findMe", null);
+__decorate([
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
+    (0, common_1.Post)('status-change'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, vdcard_status_dto_1.VdcardStatusDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "statusUpdate", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

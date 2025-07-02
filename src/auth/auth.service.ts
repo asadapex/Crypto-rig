@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -10,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { VdcardStatusDto } from './dto/vdcard-status.dto';
 
 @Injectable()
 export class AuthService {
@@ -177,16 +179,54 @@ export class AuthService {
       monthlyProfit: user.monthlyProfit,
       cards: user.cards.map((card) => {
         return {
+          id: card.id,
           type: `${card.videcard.manufacturer} ${card.videcard.model}`,
           createdAt: card.createdAt,
           hashRate: card.videcard.hashRate,
+          status: card.status,
         };
       }),
     };
 
     return {
       data,
-      messages: [''],
+      messages: [],
+      statusCode: 200,
+      time: new Date(),
+    };
+  }
+
+  async updateStatus(userId: string, data: VdcardStatusDto) {
+    const userCard = await this.prisma.userVideoCard.findUnique({
+      where: { id: data.id },
+    });
+
+    if (!userCard) {
+      throw new NotFoundException({
+        data: [],
+        messages: ['Video card not found'],
+        statusCode: 404,
+        time: new Date(),
+      });
+    }
+
+    if (userCard.userId !== userId) {
+      throw new ForbiddenException({
+        data: [],
+        messages: ['You are not allowed to update this card'],
+        statusCode: 403,
+        time: new Date(),
+      });
+    }
+
+    const updated = await this.prisma.userVideoCard.update({
+      where: { id: data.id },
+      data: { status: data.status },
+    });
+
+    return {
+      data: [updated],
+      messages: ['Status changed'],
       statusCode: 200,
       time: new Date(),
     };

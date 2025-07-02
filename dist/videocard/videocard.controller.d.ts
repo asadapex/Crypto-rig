@@ -7,6 +7,7 @@ export declare class VideocardController {
     create(createVideocardDto: CreateVideocardDto): Promise<{
         data: {
             id: string;
+            createdAt: Date;
             manufacturer: string;
             model: string;
             release: number;
@@ -20,7 +21,6 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
-            createdAt: Date;
         }[];
         messages: string[];
         statusCode: number;
@@ -29,6 +29,7 @@ export declare class VideocardController {
     findAll(): Promise<{
         data: {
             id: string;
+            createdAt: Date;
             manufacturer: string;
             model: string;
             release: number;
@@ -42,7 +43,6 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
-            createdAt: Date;
         }[];
         messages: string[];
         statusCode: number;
@@ -51,6 +51,7 @@ export declare class VideocardController {
     findOne(id: string): Promise<{
         data: {
             id: string;
+            createdAt: Date;
             manufacturer: string;
             model: string;
             release: number;
@@ -64,7 +65,6 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
-            createdAt: Date;
         }[];
         messages: string[];
         statusCode: number;
@@ -73,6 +73,7 @@ export declare class VideocardController {
     update(id: string, updateVideocardDto: UpdateVideocardDto): Promise<{
         data: {
             id: string;
+            createdAt: Date;
             manufacturer: string;
             model: string;
             release: number;
@@ -86,7 +87,6 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
-            createdAt: Date;
         }[];
         messages: string[];
         statusCode: number;
@@ -95,6 +95,7 @@ export declare class VideocardController {
     remove(id: string): Promise<{
         data: {
             id: string;
+            createdAt: Date;
             manufacturer: string;
             model: string;
             release: number;
@@ -108,7 +109,6 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
-            createdAt: Date;
         }[];
         messages: string[];
         statusCode: number;
