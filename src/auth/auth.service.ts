@@ -180,6 +180,7 @@ export class AuthService {
       cards: user.cards.map((card) => {
         return {
           id: card.id,
+          image: card.videcard.image,
           type: `${card.videcard.manufacturer} ${card.videcard.model}`,
           createdAt: card.createdAt,
           hashRate: card.videcard.hashRate,
