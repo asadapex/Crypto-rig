@@ -53,6 +53,7 @@ model VideoCard {
   temperature     String
   noiseLevel      String
   weight          String
+  price           Int             @default(0)
   createdAt       DateTime        @default(now())
   UserVideoCard   UserVideoCard[]
 }

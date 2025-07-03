@@ -1,7 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateVideocardDto {
+  @ApiProperty({ type: String, example: 'image link' })
+  @IsString()
+  @IsOptional()
+  image: string;
+
   @ApiProperty({ type: String, example: 'Bitmain' })
   @IsString()
   manufacturer: string;
@@ -53,4 +58,8 @@ export class CreateVideocardDto {
   @ApiProperty({ type: String, example: '17 kg' })
   @IsString()
   weight: string;
+
+  @ApiProperty({ type: Number, example: 100 })
+  @IsNumber()
+  price: number;
 }
