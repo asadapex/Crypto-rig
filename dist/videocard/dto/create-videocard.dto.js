@@ -13,6 +13,7 @@ exports.CreateVideocardDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateVideocardDto {
+    image;
     manufacturer;
     model;
     release;
@@ -26,8 +27,15 @@ class CreateVideocardDto {
     temperature;
     noiseLevel;
     weight;
+    price;
 }
 exports.CreateVideocardDto = CreateVideocardDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, example: 'image link' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateVideocardDto.prototype, "image", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: String, example: 'Bitmain' }),
     (0, class_validator_1.IsString)(),
@@ -93,4 +101,9 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateVideocardDto.prototype, "weight", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, example: 100 }),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateVideocardDto.prototype, "price", void 0);
 //# sourceMappingURL=create-videocard.dto.js.map

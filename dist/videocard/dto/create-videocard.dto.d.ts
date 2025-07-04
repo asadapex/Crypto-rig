@@ -1,4 +1,5 @@
 export declare class CreateVideocardDto {
+    image: string;
     manufacturer: string;
     model: string;
     release: number;
@@ -12,4 +13,5 @@ export declare class CreateVideocardDto {
     temperature: string;
     noiseLevel: string;
     weight: string;
+    price: number;
 }

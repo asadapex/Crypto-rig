@@ -12,6 +12,8 @@ import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
+import { WithdrawDto } from './dto/withdraw.dto';
+import { WithdrawStatus } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -195,6 +197,65 @@ export class AuthService {
       statusCode: 200,
       time: new Date(),
     };
+  }
+
+  async withdrawBalance(req: Request, data: WithdrawDto) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: req['user-id'] },
+      });
+      if (!user)
+        return {
+          data: [],
+          messages: ['User not found'],
+          statusCode: 404,
+          time: new Date(),
+        };
+      if (user?.monthlyProfit >= data.amount) {
+        await this.prisma.withdraw.create({
+          data: { ...data, userId: req['user-id'] },
+        });
+        return {
+          data: [],
+          messages: ['Withdraw request created'],
+          statusCode: 200,
+          time: new Date(),
+        };
+      } else {
+        return {
+          data: [],
+          messages: ['Not enough amount'],
+          statusCode: 400,
+          time: new Date(),
+        };
+      }
+    } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
+      console.log(error);
+      throw new InternalServerErrorException({ message: 'Server error' });
+    }
+  }
+
+  async withdrawRequests(req: Request) {
+    try {
+      const withdraws = await this.prisma.withdraw.findMany({
+        where: { userId: req['user-id'] },
+      });
+      return {
+        data: withdraws,
+        messages: [''],
+        statusCode: 200,
+        time: new Date(),
+      };
+    } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
+      console.log(error);
+      throw new InternalServerErrorException({ message: 'Server error' });
+    }
   }
 
   async updateStatus(userId: string, data: VdcardStatusDto) {

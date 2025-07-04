@@ -6,12 +6,12 @@ export declare class UsersController {
     constructor(usersService: UsersService);
     create(createUserDto: CreateUserDto): Promise<{
         data: {
+            id: string;
             email: string;
             password: string;
             name: string | null;
             surname: string | null;
             phoneNumber: string | null;
-            id: string;
             verified: number;
             btc: number;
             monthlyProfit: number;
@@ -24,12 +24,12 @@ export declare class UsersController {
     } | undefined>;
     findAll(): Promise<{
         data: {
+            id: string;
             email: string;
             password: string;
             name: string | null;
             surname: string | null;
             phoneNumber: string | null;
-            id: string;
             verified: number;
             btc: number;
             monthlyProfit: number;
@@ -42,12 +42,12 @@ export declare class UsersController {
     }>;
     findOne(id: string): Promise<{
         data: ({
+            id: string;
             email: string;
             password: string;
             name: string | null;
             surname: string | null;
             phoneNumber: string | null;
-            id: string;
             verified: number;
             btc: number;
             monthlyProfit: number;
@@ -58,6 +58,18 @@ export declare class UsersController {
         statusCode: number;
         time: Date;
     }>;
-    update(id: string, updateUserDto: UpdateUserDto): Promise<void>;
+    update(id: string, updateUserDto: UpdateUserDto): Promise<{
+        id: string;
+        email: string;
+        password: string;
+        name: string | null;
+        surname: string | null;
+        phoneNumber: string | null;
+        verified: number;
+        btc: number;
+        monthlyProfit: number;
+        balance: number;
+        createdAt: Date;
+    }>;
     remove(id: string): Promise<string>;
 }

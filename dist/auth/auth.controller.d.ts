@@ -3,6 +3,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { Request } from 'express';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
+import { WithdrawDto } from './dto/withdraw.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -43,6 +44,7 @@ export declare class AuthController {
             monthlyProfit: number;
             cards: {
                 id: string;
+                image: string | null;
                 type: string;
                 createdAt: Date;
                 hashRate: string;
@@ -53,12 +55,29 @@ export declare class AuthController {
         statusCode: number;
         time: Date;
     }>;
+    withdrawBalance(req: Request, data: WithdrawDto): Promise<{
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
+    myWithdraws(req: Request): Promise<{
+        data: {
+            id: string;
+            userId: string;
+            status: import(".prisma/client").$Enums.WithdrawStatus;
+            amount: number;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
     statusUpdate(req: Request, data: VdcardStatusDto): Promise<{
         data: {
             id: string;
-            status: import(".prisma/client").$Enums.Status;
             createdAt: Date;
             userId: string;
+            status: import(".prisma/client").$Enums.Status;
             videoCardId: string;
         }[];
         messages: string[];

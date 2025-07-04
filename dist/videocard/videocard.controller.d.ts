@@ -22,6 +22,7 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
+            price: number;
         }[];
         messages: string[];
         statusCode: number;
@@ -45,6 +46,7 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
+            price: number;
         }[];
         messages: string[];
         statusCode: number;
@@ -68,6 +70,7 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
+            price: number;
         }[];
         messages: string[];
         statusCode: number;
@@ -91,6 +94,7 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
+            price: number;
         }[];
         messages: string[];
         statusCode: number;
@@ -114,6 +118,7 @@ export declare class VideocardController {
             temperature: string;
             noiseLevel: string;
             weight: string;
+            price: number;
         }[];
         messages: string[];
         statusCode: number;

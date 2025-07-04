@@ -172,6 +172,7 @@ let AuthService = class AuthService {
             cards: user.cards.map((card) => {
                 return {
                     id: card.id,
+                    image: card.videcard.image,
                     type: `${card.videcard.manufacturer} ${card.videcard.model}`,
                     createdAt: card.createdAt,
                     hashRate: card.videcard.hashRate,
@@ -185,6 +186,66 @@ let AuthService = class AuthService {
             statusCode: 200,
             time: new Date(),
         };
+    }
+    async withdrawBalance(req, data) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { id: req['user-id'] },
+            });
+            if (!user)
+                return {
+                    data: [],
+                    messages: ['User not found'],
+                    statusCode: 404,
+                    time: new Date(),
+                };
+            if (user?.monthlyProfit >= data.amount) {
+                await this.prisma.withdraw.create({
+                    data: { ...data, userId: req['user-id'] },
+                });
+                return {
+                    data: [],
+                    messages: ['Withdraw request created'],
+                    statusCode: 200,
+                    time: new Date(),
+                };
+            }
+            else {
+                return {
+                    data: [],
+                    messages: ['Not enough amount'],
+                    statusCode: 400,
+                    time: new Date(),
+                };
+            }
+        }
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.log(error);
+            throw new common_1.InternalServerErrorException({ message: 'Server error' });
+        }
+    }
+    async withdrawRequests(req) {
+        try {
+            const withdraws = await this.prisma.withdraw.findMany({
+                where: { userId: req['user-id'] },
+            });
+            return {
+                data: withdraws,
+                messages: [''],
+                statusCode: 200,
+                time: new Date(),
+            };
+        }
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.log(error);
+            throw new common_1.InternalServerErrorException({ message: 'Server error' });
+        }
     }
     async updateStatus(userId, data) {
         const userCard = await this.prisma.userVideoCard.findUnique({

@@ -5,6 +5,7 @@ import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { Request } from 'express';
 import { AuthGuard } from 'src/jwtauth/jwtauth.guard';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
+import { WithdrawDto } from './dto/withdraw.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,6 +31,18 @@ export class AuthController {
   @Get('profile')
   findMe(@Req() req: Request) {
     return this.authService.findMe(req);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('withdraw-request')
+  withdrawBalance(@Req() req: Request, @Body() data: WithdrawDto) {
+    return this.authService.withdrawBalance(req, data);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('my-withdraw')
+  myWithdraws(@Req() req: Request) {
+    return this.authService.withdrawRequests(req);
   }
 
   @UseGuards(AuthGuard)

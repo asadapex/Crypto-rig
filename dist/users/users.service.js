@@ -74,6 +74,7 @@ let UsersService = class UsersService {
             where: { id },
             data: updateUserDto,
         });
+        return updated;
     }
     async remove(id) {
         return `This action removes a #${id} user`;

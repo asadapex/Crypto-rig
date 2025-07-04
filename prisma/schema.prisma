@@ -12,6 +12,13 @@ enum Status {
   OFFLINE
 }
 
+enum WithdrawStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  ONREVIEW
+}
+
 model User {
   id            String          @id @default(uuid())
   email         String          @unique
@@ -25,6 +32,15 @@ model User {
   monthlyProfit Float           @default(0)
   balance       Int             @default(0)
   createdAt     DateTime        @default(now())
+  Withdraw      Withdraw[]
+}
+
+model Withdraw {
+  id     String         @id @default(uuid())
+  user   User           @relation(fields: [userId], references: [id])
+  userId String
+  amount Int
+  status WithdrawStatus @default(PENDING)
 }
 
 model UserVideoCard {

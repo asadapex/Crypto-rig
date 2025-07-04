@@ -72,6 +72,7 @@ export class UsersService {
       where: { id },
       data: updateUserDto,
     });
+    return updated;
   }
 
   async remove(id: string) {
