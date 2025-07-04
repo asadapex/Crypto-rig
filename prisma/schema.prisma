@@ -19,6 +19,12 @@ enum WithdrawStatus {
   ONREVIEW
 }
 
+enum PaymentMethod {
+  VISA
+  MASTERCARD
+  CRYPTO
+}
+
 model User {
   id            String          @id @default(uuid())
   email         String          @unique
@@ -35,11 +41,12 @@ model User {
 }
 
 model Withdraw {
-  id     String         @id @default(uuid())
-  user   User           @relation(fields: [userId], references: [id])
-  userId String
-  amount Float
-  status WithdrawStatus @default(PENDING)
+  id            String         @id @default(uuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String
+  amount        Float
+  paymentMethod PaymentMethod  @default(VISA)
+  status        WithdrawStatus @default(PENDING)
 }
 
 model UserVideoCard {

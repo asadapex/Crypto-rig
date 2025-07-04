@@ -275,6 +275,14 @@ export class AuthService {
         });
 
       if (user.balance >= data.amount) {
+        const withdrawreq = await this.prisma.withdraw.create({
+          data: {
+            amount: data.amount,
+            paymentMethod: data.paymentMethod,
+            status: WithdrawStatus.PENDING,
+            userId: req['user-id'],
+          },
+        });
         await this.prisma.user.update({
           where: { id: user.id },
           data: { balance: user.balance - data.amount },
@@ -283,7 +291,7 @@ export class AuthService {
           data: { ...data, userId: req['user-id'] },
         });
         return {
-          data: [],
+          data: [withdrawreq],
           messages: ['Withdraw request created'],
           statusCode: 200,
           time: new Date(),

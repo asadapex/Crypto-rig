@@ -78,7 +78,13 @@ export declare class AuthService {
         time: Date;
     }>;
     withdrawBalance(req: Request, data: WithdrawDto): Promise<{
-        data: never[];
+        data: {
+            id: string;
+            status: import(".prisma/client").$Enums.WithdrawStatus;
+            amount: number;
+            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            userId: string;
+        }[];
         messages: string[];
         statusCode: number;
         time: Date;
@@ -88,6 +94,7 @@ export declare class AuthService {
             id: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
+            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
             userId: string;
         }[];
         messages: string[];

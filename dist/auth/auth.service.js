@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
 const jwt_1 = require("@nestjs/jwt");
+const client_1 = require("@prisma/client");
 let AuthService = class AuthService {
     prisma;
     jwt;
@@ -256,6 +257,14 @@ let AuthService = class AuthService {
                     time: new Date(),
                 });
             if (user.balance >= data.amount) {
+                const withdrawreq = await this.prisma.withdraw.create({
+                    data: {
+                        amount: data.amount,
+                        paymentMethod: data.paymentMethod,
+                        status: client_1.WithdrawStatus.PENDING,
+                        userId: req['user-id'],
+                    },
+                });
                 await this.prisma.user.update({
                     where: { id: user.id },
                     data: { balance: user.balance - data.amount },
@@ -264,7 +273,7 @@ let AuthService = class AuthService {
                     data: { ...data, userId: req['user-id'] },
                 });
                 return {
-                    data: [],
+                    data: [withdrawreq],
                     messages: ['Withdraw request created'],
                     statusCode: 200,
                     time: new Date(),
