@@ -4,6 +4,7 @@ import { VerifyAuthDto } from './dto/verify-auth.dto';
 import { Request } from 'express';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
+import { CollectUserBalanceDto } from './dto/collect-balance.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -40,7 +41,7 @@ export declare class AuthController {
             phoneNumber: string | null;
             email: string;
             verified: number;
-            btc: number;
+            balance: number;
             monthlyProfit: number;
             cards: {
                 id: string;
@@ -48,6 +49,7 @@ export declare class AuthController {
                 type: string;
                 createdAt: Date;
                 hashRate: string;
+                earned: number;
                 status: import(".prisma/client").$Enums.Status;
             }[];
         };
@@ -55,6 +57,12 @@ export declare class AuthController {
         statusCode: number;
         time: Date;
     }>;
+    collectVideoCardBalance(req: Request, data: CollectUserBalanceDto): Promise<{
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    } | undefined>;
     withdrawBalance(req: Request, data: WithdrawDto): Promise<{
         data: never[];
         messages: string[];
@@ -64,9 +72,9 @@ export declare class AuthController {
     myWithdraws(req: Request): Promise<{
         data: {
             id: string;
-            userId: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
+            userId: string;
         }[];
         messages: string[];
         statusCode: number;
@@ -75,9 +83,10 @@ export declare class AuthController {
     statusUpdate(req: Request, data: VdcardStatusDto): Promise<{
         data: {
             id: string;
+            status: import(".prisma/client").$Enums.Status;
             createdAt: Date;
             userId: string;
-            status: import(".prisma/client").$Enums.Status;
+            earned: number;
             videoCardId: string;
         }[];
         messages: string[];

@@ -14,6 +14,7 @@ import { Request } from 'express';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import { WithdrawStatus } from '@prisma/client';
+import { CollectUserBalanceDto } from './dto/collect-balance.dto';
 
 @Injectable()
 export class AuthService {
@@ -151,6 +152,66 @@ export class AuthService {
     }
   }
 
+  async collectUserBalance(req: Request, data: CollectUserBalanceDto) {
+    try {
+      const userVideoCard = await this.prisma.userVideoCard.findFirst({
+        where: { userId: req['user-id'], id: data.id },
+      });
+      if (!userVideoCard) {
+        throw new NotFoundException({
+          data: [],
+          messages: ['Not found'],
+          statusCode: 404,
+          time: new Date(),
+        });
+      }
+
+      if (userVideoCard.earned == 0)
+        throw new BadRequestException({
+          data: [],
+          messages: ['Mining device has not earned yet'],
+          statusCode: 400,
+          time: new Date(),
+        });
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: req['user-id'] },
+      });
+
+      if (!user) {
+        throw new NotFoundException({
+          data: [],
+          messages: ['User not found'],
+          statusCode: 404,
+          time: new Date(),
+        });
+      }
+
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: { id: req['user-id'] },
+          data: { balance: user?.balance + userVideoCard.earned },
+        }),
+        this.prisma.userVideoCard.update({
+          where: { id: userVideoCard.id },
+          data: { earned: 0 },
+        }),
+      ]);
+
+      return {
+        data: [],
+        messages: ['Money collected'],
+        statusCode: 200,
+        time: new Date(),
+      };
+    } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
+      console.log(error);
+    }
+  }
+
   async findMe(req: Request) {
     const user = await this.prisma.user.findUnique({
       where: { id: req['user-id'] },
@@ -177,7 +238,7 @@ export class AuthService {
       phoneNumber: user.phoneNumber,
       email: user.email,
       verified: user.verified,
-      btc: user.btc,
+      balance: user.balance,
       monthlyProfit: user.monthlyProfit,
       cards: user.cards.map((card) => {
         return {
@@ -186,6 +247,7 @@ export class AuthService {
           type: `${card.videcard.manufacturer} ${card.videcard.model}`,
           createdAt: card.createdAt,
           hashRate: card.videcard.hashRate,
+          earned: card.earned,
           status: card.status,
         };
       }),
@@ -205,13 +267,18 @@ export class AuthService {
         where: { id: req['user-id'] },
       });
       if (!user)
-        return {
+        throw new BadRequestException({
           data: [],
           messages: ['User not found'],
           statusCode: 404,
           time: new Date(),
-        };
-      if (user?.monthlyProfit >= data.amount) {
+        });
+
+      if (user.balance >= data.amount) {
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { balance: user.balance - data.amount },
+        });
         await this.prisma.withdraw.create({
           data: { ...data, userId: req['user-id'] },
         });

@@ -1,45 +1,39 @@
-// import { Injectable } from '@nestjs/common';
-// import { Cron } from '@nestjs/schedule';
-// import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
+import { PrismaService } from '../prisma/prisma.service';
+import { Status } from '@prisma/client';
 
-// @Injectable()
-// export class MiningService {
-//   constructor(private readonly prisma: PrismaService) {}
+@Injectable()
+export class MiningService {
+  constructor(private readonly prisma: PrismaService) {}
 
-//   @Cron('0 0 1 * *')
-//   async resetMonthlyProfit() {
-//     await this.prisma.user.updateMany({
-//       data: { monthlyProfit: 0 },
-//     });
-//   }
+  @Cron('0 0 1 * *')
+  async resetMonthlyProfit() {
+    await this.prisma.user.updateMany({
+      data: { monthlyProfit: 0 },
+    });
+  }
 
-//   @Cron('0 0 * * *')
-//   async handleMining() {
-//     const users = await this.prisma.user.findMany({
-//       include: {
-//         cards: {
-//           include: {
-//             videcard: true,
-//           },
-//         },
-//       },
-//     });
+  @Cron('* * * * *')
+  async handleMining() {
+    const userCards = await this.prisma.userVideoCard.findMany({
+      where: {
+        status: Status.ACTIVE,
+      },
+    });
 
-//     for (const user of users) {
-//       const totalProfit = user.cards.reduce((acc, card) => {
-//         const hashRate = card.videcard.hashRate;
-//         return typeof hashRate === 'number' ? acc + hashRate * 24 : acc;
-//       }, 0);
+    const updates = userCards.map((card) =>
+      this.prisma.userVideoCard.update({
+        where: { id: card.id },
+        data: {
+          earned: {
+            increment: 0.0037,
+          },
+        },
+      }),
+    );
 
-//       if (totalProfit > 0) {
-//         await this.prisma.user.update({
-//           where: { id: user.id },
-//           data: {
-//             btc: { increment: totalProfit },
-//             monthlyProfit: { increment: totalProfit },
-//           },
-//         });
-//       }
-//     }
-//   }
-// }
+    await this.prisma.$transaction(updates);
+    console.log(`[MINING] ${userCards.length} ACTIVE cards updated`);
+  }
+}

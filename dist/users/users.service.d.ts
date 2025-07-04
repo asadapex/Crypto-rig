@@ -5,28 +5,26 @@ export declare class UsersService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     findUser(email: string): Promise<{
-        id: string;
         email: string;
         password: string;
         name: string | null;
         surname: string | null;
         phoneNumber: string | null;
+        id: string;
         verified: number;
-        btc: number;
         monthlyProfit: number;
         balance: number;
         createdAt: Date;
     } | null>;
     create(data: CreateUserDto): Promise<{
         data: {
-            id: string;
             email: string;
             password: string;
             name: string | null;
             surname: string | null;
             phoneNumber: string | null;
+            id: string;
             verified: number;
-            btc: number;
             monthlyProfit: number;
             balance: number;
             createdAt: Date;
@@ -37,14 +35,13 @@ export declare class UsersService {
     } | undefined>;
     findAll(): Promise<{
         data: {
-            id: string;
             email: string;
             password: string;
             name: string | null;
             surname: string | null;
             phoneNumber: string | null;
+            id: string;
             verified: number;
-            btc: number;
             monthlyProfit: number;
             balance: number;
             createdAt: Date;
@@ -55,14 +52,13 @@ export declare class UsersService {
     }>;
     findOne(id: string): Promise<{
         data: ({
-            id: string;
             email: string;
             password: string;
             name: string | null;
             surname: string | null;
             phoneNumber: string | null;
+            id: string;
             verified: number;
-            btc: number;
             monthlyProfit: number;
             balance: number;
             createdAt: Date;
@@ -72,14 +68,13 @@ export declare class UsersService {
         time: Date;
     }>;
     update(id: string, updateUserDto: UpdateUserDto): Promise<{
-        id: string;
         email: string;
         password: string;
         name: string | null;
         surname: string | null;
         phoneNumber: string | null;
+        id: string;
         verified: number;
-        btc: number;
         monthlyProfit: number;
         balance: number;
         createdAt: Date;

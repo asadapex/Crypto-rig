@@ -20,6 +20,7 @@ const verify_auth_dto_1 = require("./dto/verify-auth.dto");
 const jwtauth_guard_1 = require("../jwtauth/jwtauth.guard");
 const vdcard_status_dto_1 = require("./dto/vdcard-status.dto");
 const withdraw_dto_1 = require("./dto/withdraw.dto");
+const collect_balance_dto_1 = require("./dto/collect-balance.dto");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -36,6 +37,9 @@ let AuthController = class AuthController {
     }
     findMe(req) {
         return this.authService.findMe(req);
+    }
+    collectVideoCardBalance(req, data) {
+        return this.authService.collectUserBalance(req, data);
     }
     withdrawBalance(req, data) {
         return this.authService.withdrawBalance(req, data);
@@ -80,6 +84,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "findMe", null);
+__decorate([
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
+    (0, common_1.Post)('collect-balance'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, collect_balance_dto_1.CollectUserBalanceDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "collectVideoCardBalance", null);
 __decorate([
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Post)('withdraw-request'),

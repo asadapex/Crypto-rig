@@ -143,6 +143,61 @@ let AuthService = class AuthService {
             console.log(error);
         }
     }
+    async collectUserBalance(req, data) {
+        try {
+            const userVideoCard = await this.prisma.userVideoCard.findFirst({
+                where: { userId: req['user-id'], id: data.id },
+            });
+            if (!userVideoCard) {
+                throw new common_1.NotFoundException({
+                    data: [],
+                    messages: ['Not found'],
+                    statusCode: 404,
+                    time: new Date(),
+                });
+            }
+            if (userVideoCard.earned == 0)
+                throw new common_1.BadRequestException({
+                    data: [],
+                    messages: ['Mining device has not earned yet'],
+                    statusCode: 400,
+                    time: new Date(),
+                });
+            const user = await this.prisma.user.findUnique({
+                where: { id: req['user-id'] },
+            });
+            if (!user) {
+                throw new common_1.NotFoundException({
+                    data: [],
+                    messages: ['User not found'],
+                    statusCode: 404,
+                    time: new Date(),
+                });
+            }
+            await this.prisma.$transaction([
+                this.prisma.user.update({
+                    where: { id: req['user-id'] },
+                    data: { balance: user?.balance + userVideoCard.earned },
+                }),
+                this.prisma.userVideoCard.update({
+                    where: { id: userVideoCard.id },
+                    data: { earned: 0 },
+                }),
+            ]);
+            return {
+                data: [],
+                messages: ['Money collected'],
+                statusCode: 200,
+                time: new Date(),
+            };
+        }
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.log(error);
+        }
+    }
     async findMe(req) {
         const user = await this.prisma.user.findUnique({
             where: { id: req['user-id'] },
@@ -167,7 +222,7 @@ let AuthService = class AuthService {
             phoneNumber: user.phoneNumber,
             email: user.email,
             verified: user.verified,
-            btc: user.btc,
+            balance: user.balance,
             monthlyProfit: user.monthlyProfit,
             cards: user.cards.map((card) => {
                 return {
@@ -176,6 +231,7 @@ let AuthService = class AuthService {
                     type: `${card.videcard.manufacturer} ${card.videcard.model}`,
                     createdAt: card.createdAt,
                     hashRate: card.videcard.hashRate,
+                    earned: card.earned,
                     status: card.status,
                 };
             }),
@@ -193,13 +249,17 @@ let AuthService = class AuthService {
                 where: { id: req['user-id'] },
             });
             if (!user)
-                return {
+                throw new common_1.BadRequestException({
                     data: [],
                     messages: ['User not found'],
                     statusCode: 404,
                     time: new Date(),
-                };
-            if (user?.monthlyProfit >= data.amount) {
+                });
+            if (user.balance >= data.amount) {
+                await this.prisma.user.update({
+                    where: { id: user.id },
+                    data: { balance: user.balance - data.amount },
+                });
                 await this.prisma.withdraw.create({
                     data: { ...data, userId: req['user-id'] },
                 });

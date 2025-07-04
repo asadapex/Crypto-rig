@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { AuthGuard } from 'src/jwtauth/jwtauth.guard';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
+import { CollectUserBalanceDto } from './dto/collect-balance.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +32,15 @@ export class AuthController {
   @Get('profile')
   findMe(@Req() req: Request) {
     return this.authService.findMe(req);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('collect-balance')
+  collectVideoCardBalance(
+    @Req() req: Request,
+    @Body() data: CollectUserBalanceDto,
+  ) {
+    return this.authService.collectUserBalance(req, data);
   }
 
   @UseGuards(AuthGuard)
