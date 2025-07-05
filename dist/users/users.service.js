@@ -79,6 +79,39 @@ let UsersService = class UsersService {
     async remove(id) {
         return `This action removes a #${id} user`;
     }
+    async topupBalance(req, data) {
+        try {
+            if (data.amount <= 0) {
+                throw new common_1.BadRequestException({
+                    data: [],
+                    messages: ['Invalid amount'],
+                    statusCode: 400,
+                    time: new Date(),
+                });
+            }
+            await this.prisma.user.update({
+                where: { id: req['user-id'] },
+                data: {
+                    balance: {
+                        increment: data.amount / 100000,
+                    },
+                },
+            });
+            return {
+                data: [],
+                messages: ['Balance top-up'],
+                statusCode: 200,
+                time: new Date(),
+            };
+        }
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.log(error);
+            throw new common_1.InternalServerErrorException({ message: 'Server error' });
+        }
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

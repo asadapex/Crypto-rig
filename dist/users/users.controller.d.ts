@@ -1,6 +1,8 @@
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { TopupBalanceDto } from './dto/topup-balance.dto';
+import { Request } from 'express';
 export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
@@ -66,6 +68,12 @@ export declare class UsersController {
         monthlyProfit: number;
         balance: number;
         createdAt: Date;
+    }>;
+    topupBalance(req: Request, data: TopupBalanceDto): Promise<{
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
     }>;
     remove(id: string): Promise<string>;
 }

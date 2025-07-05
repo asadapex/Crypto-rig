@@ -1,6 +1,8 @@
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Request } from 'express';
+import { TopupBalanceDto } from './dto/topup-balance.dto';
 export declare class UsersService {
     private readonly prisma;
     constructor(prisma: PrismaService);
@@ -80,4 +82,10 @@ export declare class UsersService {
         createdAt: Date;
     }>;
     remove(id: string): Promise<string>;
+    topupBalance(req: Request, data: TopupBalanceDto): Promise<{
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
 }

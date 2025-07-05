@@ -2,11 +2,14 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { Request } from 'express';
+import { TopupBalanceDto } from './dto/topup-balance.dto';
 
 @Injectable()
 export class UsersService {
@@ -77,5 +80,38 @@ export class UsersService {
 
   async remove(id: string) {
     return `This action removes a #${id} user`;
+  }
+
+  async topupBalance(req: Request, data: TopupBalanceDto) {
+    try {
+      if (data.amount <= 0) {
+        throw new BadRequestException({
+          data: [],
+          messages: ['Invalid amount'],
+          statusCode: 400,
+          time: new Date(),
+        });
+      }
+      await this.prisma.user.update({
+        where: { id: req['user-id'] },
+        data: {
+          balance: {
+            increment: data.amount / 100000,
+          },
+        },
+      });
+      return {
+        data: [],
+        messages: ['Balance top-up'],
+        statusCode: 200,
+        time: new Date(),
+      };
+    } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
+      console.log(error);
+      throw new InternalServerErrorException({ message: 'Server error' });
+    }
   }
 }
