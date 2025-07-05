@@ -274,7 +274,10 @@ export class AuthService {
           time: new Date(),
         });
 
-      if (user.balance >= data.amount) {
+      const USD_TO_BTC = 1 / 100000;
+      const amountInBTC = data.amount * USD_TO_BTC;
+
+      if (user.balance >= amountInBTC) {
         const withdrawreq = await this.prisma.withdraw.create({
           data: {
             amount: data.amount,
