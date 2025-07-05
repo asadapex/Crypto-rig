@@ -65,6 +65,7 @@ export declare class AuthController {
     } | undefined>;
     withdrawBalance(req: Request, data: WithdrawDto): Promise<{
         data: {
+            type: import(".prisma/client").$Enums.WithdrawType;
             id: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
@@ -77,6 +78,7 @@ export declare class AuthController {
     }>;
     myWithdraws(req: Request): Promise<{
         data: {
+            type: import(".prisma/client").$Enums.WithdrawType;
             id: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;

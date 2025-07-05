@@ -13,6 +13,7 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
+const client_1 = require("@prisma/client");
 let UsersService = class UsersService {
     prisma;
     constructor(prisma) {
@@ -89,17 +90,18 @@ let UsersService = class UsersService {
                     time: new Date(),
                 });
             }
-            await this.prisma.user.update({
-                where: { id: req['user-id'] },
+            await this.prisma.withdraw.create({
                 data: {
-                    balance: {
-                        increment: data.amount / 100000,
-                    },
+                    amount: data.amount,
+                    type: client_1.WithdrawType.TOPUP,
+                    paymentMethod: data.paymentMethod,
+                    status: client_1.WithdrawStatus.PENDING,
+                    userId: req['user-id'],
                 },
             });
             return {
                 data: [],
-                messages: ['Balance top-up'],
+                messages: ['Balance top-up request created'],
                 statusCode: 200,
                 time: new Date(),
             };

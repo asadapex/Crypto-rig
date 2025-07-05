@@ -25,6 +25,11 @@ enum PaymentMethod {
   CRYPTO
 }
 
+enum WithdrawType {
+  TOPUP
+  WITHDRAW
+}
+
 model User {
   id            String          @id @default(uuid())
   email         String          @unique
@@ -46,6 +51,7 @@ model Withdraw {
   userId        String
   amount        Float
   paymentMethod PaymentMethod  @default(VISA)
+  type          WithdrawType   @default(WITHDRAW)
   status        WithdrawStatus @default(PENDING)
 }
 

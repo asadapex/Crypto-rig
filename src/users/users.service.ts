@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { TopupBalanceDto } from './dto/topup-balance.dto';
+import { WithdrawStatus, WithdrawType } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -92,17 +93,27 @@ export class UsersService {
           time: new Date(),
         });
       }
-      await this.prisma.user.update({
-        where: { id: req['user-id'] },
+      // await this.prisma.user.update({
+      //   where: { id: req['user-id'] },
+      //   data: {
+      //     balance: {
+      //       increment: data.amount / 100000,
+      //     },
+      //   },
+      // });
+
+      await this.prisma.withdraw.create({
         data: {
-          balance: {
-            increment: data.amount / 100000,
-          },
+          amount: data.amount,
+          type: WithdrawType.TOPUP,
+          paymentMethod: data.paymentMethod,
+          status: WithdrawStatus.PENDING,
+          userId: req['user-id'],
         },
       });
       return {
         data: [],
-        messages: ['Balance top-up'],
+        messages: ['Balance top-up request created'],
         statusCode: 200,
         time: new Date(),
       };
