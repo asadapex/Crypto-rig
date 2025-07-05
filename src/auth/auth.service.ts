@@ -288,7 +288,7 @@ export class AuthService {
         });
         await this.prisma.user.update({
           where: { id: user.id },
-          data: { balance: user.balance - data.amount },
+          data: { balance: user.balance - amountInBTC },
         });
         await this.prisma.withdraw.create({
           data: { ...data, userId: req['user-id'] },

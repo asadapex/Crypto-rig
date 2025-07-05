@@ -256,7 +256,9 @@ let AuthService = class AuthService {
                     statusCode: 404,
                     time: new Date(),
                 });
-            if (user.balance >= data.amount) {
+            const USD_TO_BTC = 1 / 100000;
+            const amountInBTC = data.amount * USD_TO_BTC;
+            if (user.balance >= amountInBTC) {
                 const withdrawreq = await this.prisma.withdraw.create({
                     data: {
                         amount: data.amount,
@@ -267,7 +269,7 @@ let AuthService = class AuthService {
                 });
                 await this.prisma.user.update({
                     where: { id: user.id },
-                    data: { balance: user.balance - data.amount },
+                    data: { balance: user.balance - amountInBTC },
                 });
                 await this.prisma.withdraw.create({
                     data: { ...data, userId: req['user-id'] },
