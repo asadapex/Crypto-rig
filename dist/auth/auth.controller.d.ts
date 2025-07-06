@@ -65,12 +65,12 @@ export declare class AuthController {
     } | undefined>;
     withdrawBalance(req: Request, data: WithdrawDto): Promise<{
         data: {
+            type: import(".prisma/client").$Enums.WithdrawType;
             id: string;
-            userId: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
-            type: import(".prisma/client").$Enums.WithdrawType;
+            userId: string;
         }[];
         messages: string[];
         statusCode: number;
@@ -78,12 +78,12 @@ export declare class AuthController {
     }>;
     myWithdraws(req: Request): Promise<{
         data: {
+            type: import(".prisma/client").$Enums.WithdrawType;
             id: string;
-            userId: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
-            type: import(".prisma/client").$Enums.WithdrawType;
+            userId: string;
         }[];
         messages: string[];
         statusCode: number;
@@ -92,9 +92,9 @@ export declare class AuthController {
     statusUpdate(req: Request, data: VdcardStatusDto): Promise<{
         data: {
             id: string;
+            status: import(".prisma/client").$Enums.Status;
             createdAt: Date;
             userId: string;
-            status: import(".prisma/client").$Enums.Status;
             earned: number;
             videoCardId: string;
         }[];

@@ -41,7 +41,7 @@ let AuthService = class AuthService {
             const user = await this.prisma.user.create({
                 data: { ...data, password: hash },
             });
-            const token = this.jwt.sign({ id: user.id });
+            const token = this.jwt.sign({ id: user.id, role: user.role });
             return {
                 data: [{ token }],
                 messages: ['User registered'],
@@ -66,6 +66,16 @@ let AuthService = class AuthService {
                     data: [],
                     messages: ['User not found'],
                     statusCode: 404,
+                    time: new Date(),
+                });
+            }
+            if (user.role == client_1.UserRole.ADMIN ||
+                user.role == client_1.UserRole.SUPPORT ||
+                user.role == client_1.UserRole.VIEWER) {
+                throw new common_1.BadRequestException({
+                    data: [],
+                    messages: ['No need to verify'],
+                    statusCode: 400,
                     time: new Date(),
                 });
             }
@@ -129,7 +139,7 @@ let AuthService = class AuthService {
                     time: new Date(),
                 });
             }
-            const token = this.jwt.sign({ id: user.id });
+            const token = this.jwt.sign({ id: user.id, role: user.role });
             return {
                 data: [{ token }],
                 messages: ['User logged in'],

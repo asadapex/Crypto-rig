@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
-import { WithdrawStatus } from '@prisma/client';
+import { UserRole, WithdrawStatus } from '@prisma/client';
 import { CollectUserBalanceDto } from './dto/collect-balance.dto';
 
 @Injectable()
@@ -45,7 +45,7 @@ export class AuthService {
         data: { ...data, password: hash },
       });
 
-      const token = this.jwt.sign({ id: user.id });
+      const token = this.jwt.sign({ id: user.id, role: user.role });
       return {
         data: [{ token }],
         messages: ['User registered'],
@@ -70,6 +70,18 @@ export class AuthService {
           data: [],
           messages: ['User not found'],
           statusCode: 404,
+          time: new Date(),
+        });
+      }
+      if (
+        user.role == UserRole.ADMIN ||
+        user.role == UserRole.SUPPORT ||
+        user.role == UserRole.VIEWER
+      ) {
+        throw new BadRequestException({
+          data: [],
+          messages: ['No need to verify'],
+          statusCode: 400,
           time: new Date(),
         });
       }
@@ -137,7 +149,7 @@ export class AuthService {
         });
       }
 
-      const token = this.jwt.sign({ id: user.id });
+      const token = this.jwt.sign({ id: user.id, role: user.role });
       return {
         data: [{ token }],
         messages: ['User logged in'],

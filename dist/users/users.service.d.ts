@@ -16,6 +16,7 @@ export declare class UsersService {
         verified: number;
         monthlyProfit: number;
         balance: number;
+        role: import(".prisma/client").$Enums.UserRole;
         createdAt: Date;
     } | null>;
     create(data: CreateUserDto): Promise<{
@@ -29,6 +30,7 @@ export declare class UsersService {
             verified: number;
             monthlyProfit: number;
             balance: number;
+            role: import(".prisma/client").$Enums.UserRole;
             createdAt: Date;
         }[];
         messages: string[];
@@ -46,6 +48,7 @@ export declare class UsersService {
             verified: number;
             monthlyProfit: number;
             balance: number;
+            role: import(".prisma/client").$Enums.UserRole;
             createdAt: Date;
         }[];
         messages: never[];
@@ -63,6 +66,7 @@ export declare class UsersService {
             verified: number;
             monthlyProfit: number;
             balance: number;
+            role: import(".prisma/client").$Enums.UserRole;
             createdAt: Date;
         } | null)[];
         messages: never[];
@@ -79,6 +83,7 @@ export declare class UsersService {
         verified: number;
         monthlyProfit: number;
         balance: number;
+        role: import(".prisma/client").$Enums.UserRole;
         createdAt: Date;
     }>;
     remove(id: string): Promise<string>;

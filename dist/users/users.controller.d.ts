@@ -17,6 +17,7 @@ export declare class UsersController {
             verified: number;
             monthlyProfit: number;
             balance: number;
+            role: import(".prisma/client").$Enums.UserRole;
             createdAt: Date;
         }[];
         messages: string[];
@@ -34,6 +35,7 @@ export declare class UsersController {
             verified: number;
             monthlyProfit: number;
             balance: number;
+            role: import(".prisma/client").$Enums.UserRole;
             createdAt: Date;
         }[];
         messages: never[];
@@ -51,6 +53,7 @@ export declare class UsersController {
             verified: number;
             monthlyProfit: number;
             balance: number;
+            role: import(".prisma/client").$Enums.UserRole;
             createdAt: Date;
         } | null)[];
         messages: never[];
@@ -67,13 +70,14 @@ export declare class UsersController {
         verified: number;
         monthlyProfit: number;
         balance: number;
+        role: import(".prisma/client").$Enums.UserRole;
         createdAt: Date;
     }>;
+    remove(id: string): Promise<string>;
     topupBalance(req: Request, data: TopupBalanceDto): Promise<{
         data: never[];
         messages: string[];
         statusCode: number;
         time: Date;
     }>;
-    remove(id: string): Promise<string>;
 }
