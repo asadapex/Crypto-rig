@@ -37,6 +37,14 @@ enum UserRole {
   VIEWER
 }
 
+model Admin {
+  id       String   @id @default(uuid())
+  name     String
+  email    String   @unique
+  password String
+  role     UserRole
+}
+
 model User {
   id            String          @id @default(uuid())
   email         String          @unique

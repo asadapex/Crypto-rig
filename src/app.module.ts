@@ -9,6 +9,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { VideocardModule } from './videocard/videocard.module';
 import { UsersModule } from './users/users.module';
 import { MulterModule } from './multer/multer.module';
+import { AdminauthModule } from './adminauth/adminauth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MulterModule } from './multer/multer.module';
     VideocardModule,
     UsersModule,
     MulterModule,
+    AdminauthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
