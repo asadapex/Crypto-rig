@@ -20,6 +20,7 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({ where: { email } });
     return user;
   }
+
   async create(data: CreateUserDto) {
     const user = await this.findUser(data.email);
     if (user) {
@@ -72,15 +73,45 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException({
+        data: [],
+        messages: ['User not found'],
+        statusCode: 404,
+        time: new Date(),
+      });
+    }
     const updated = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
-    return updated;
+    return {
+      data: [updated],
+      messages: [],
+      statusCode: 200,
+      time: new Date(),
+    };
   }
 
   async remove(id: string) {
-    return `This action removes a #${id} user`;
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException({
+        data: [],
+        messages: ['User not found'],
+        statusCode: 404,
+        time: new Date(),
+      });
+    }
+
+    const deleted = await this.prisma.user.delete({ where: { id } });
+    return {
+      data: [deleted],
+      messages: ['User deleted'],
+      statusCode: 200,
+      time: new Date(),
+    };
   }
 
   async topupBalance(req: Request, data: TopupBalanceDto) {
