@@ -106,7 +106,9 @@ export class UsersService {
         });
       }
 
+      await this.prisma.userVideoCard.deleteMany({ where: { userId: id } });
       const deleted = await this.prisma.user.delete({ where: { id } });
+
       return {
         data: [deleted],
         messages: ['User deleted'],
