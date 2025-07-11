@@ -87,6 +87,11 @@ export class AdminauthService {
     }
   }
 
+  async findAll() {
+    const all = await this.prisma.admin.findMany();
+    return all;
+  }
+
   async findMe(req: Request) {
     try {
       const admin = await this.prisma.admin.findUnique({

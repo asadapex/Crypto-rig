@@ -71,14 +71,43 @@ let UsersService = class UsersService {
         };
     }
     async update(id, updateUserDto) {
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (!user) {
+            throw new common_1.NotFoundException({
+                data: [],
+                messages: ['User not found'],
+                statusCode: 404,
+                time: new Date(),
+            });
+        }
         const updated = await this.prisma.user.update({
             where: { id },
             data: updateUserDto,
         });
-        return updated;
+        return {
+            data: [updated],
+            messages: [],
+            statusCode: 200,
+            time: new Date(),
+        };
     }
     async remove(id) {
-        return `This action removes a #${id} user`;
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (!user) {
+            throw new common_1.NotFoundException({
+                data: [],
+                messages: ['User not found'],
+                statusCode: 404,
+                time: new Date(),
+            });
+        }
+        const deleted = await this.prisma.user.delete({ where: { id } });
+        return {
+            data: [deleted],
+            messages: ['User deleted'],
+            statusCode: 200,
+            time: new Date(),
+        };
     }
     async topupBalance(req, data) {
         try {

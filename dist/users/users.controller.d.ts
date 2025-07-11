@@ -61,19 +61,41 @@ export declare class UsersController {
         time: Date;
     }>;
     update(id: string, updateUserDto: UpdateUserDto): Promise<{
-        email: string;
-        password: string;
-        name: string | null;
-        surname: string | null;
-        phoneNumber: string | null;
-        id: string;
-        verified: number;
-        monthlyProfit: number;
-        balance: number;
-        role: import(".prisma/client").$Enums.UserRole;
-        createdAt: Date;
+        data: {
+            email: string;
+            password: string;
+            name: string | null;
+            surname: string | null;
+            phoneNumber: string | null;
+            id: string;
+            verified: number;
+            monthlyProfit: number;
+            balance: number;
+            role: import(".prisma/client").$Enums.UserRole;
+            createdAt: Date;
+        }[];
+        messages: never[];
+        statusCode: number;
+        time: Date;
     }>;
-    remove(id: string): Promise<string>;
+    remove(id: string): Promise<{
+        data: {
+            email: string;
+            password: string;
+            name: string | null;
+            surname: string | null;
+            phoneNumber: string | null;
+            id: string;
+            verified: number;
+            monthlyProfit: number;
+            balance: number;
+            role: import(".prisma/client").$Enums.UserRole;
+            createdAt: Date;
+        }[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
     topupBalance(req: Request, data: TopupBalanceDto): Promise<{
         data: never[];
         messages: string[];

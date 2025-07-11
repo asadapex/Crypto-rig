@@ -19,6 +19,11 @@ export class AdminauthController {
     return this.adminauthService.login(createAuthDto);
   }
 
+  @Get()
+  findAll() {
+    return this.adminauthService.findAll();
+  }
+
   @UseGuards(AuthGuard)
   @Get('profile')
   findMe(@Req() req: Request) {
