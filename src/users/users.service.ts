@@ -95,23 +95,27 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) {
-      throw new NotFoundException({
-        data: [],
-        messages: ['User not found'],
-        statusCode: 404,
-        time: new Date(),
-      });
-    }
+    try {
+      const user = await this.prisma.user.findUnique({ where: { id } });
+      if (!user) {
+        throw new NotFoundException({
+          data: [],
+          messages: ['User not found'],
+          statusCode: 404,
+          time: new Date(),
+        });
+      }
 
-    const deleted = await this.prisma.user.delete({ where: { id } });
-    return {
-      data: [deleted],
-      messages: ['User deleted'],
-      statusCode: 200,
-      time: new Date(),
-    };
+      const deleted = await this.prisma.user.delete({ where: { id } });
+      return {
+        data: [deleted],
+        messages: ['User deleted'],
+        statusCode: 200,
+        time: new Date(),
+      };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async topupBalance(req: Request, data: TopupBalanceDto) {
