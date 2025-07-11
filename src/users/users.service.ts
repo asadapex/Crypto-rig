@@ -82,10 +82,21 @@ export class UsersService {
         time: new Date(),
       });
     }
+
+    if (!updateUserDto || Object.keys(updateUserDto).length === 0) {
+      throw new BadRequestException({
+        data: [],
+        messages: ['Update data is missing'],
+        statusCode: 400,
+        time: new Date(),
+      });
+    }
+
     const updated = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
+
     return {
       data: [updated],
       messages: [],
