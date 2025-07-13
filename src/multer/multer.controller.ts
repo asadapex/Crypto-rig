@@ -35,6 +35,9 @@ export class MulterController {
           cb(null, uniqueName);
         },
       }),
+      limits: {
+        fileSize: 100 * 1024 * 1024,
+      },
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
