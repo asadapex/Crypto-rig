@@ -19,7 +19,7 @@ export class AdminauthService {
   ) {}
   async create(data: CreateAdminDto) {
     try {
-      const admin = await this.prisma.admin.findUnique({
+      const admin = await this.prisma.user.findUnique({
         where: { email: data.email },
       });
       if (admin) {
@@ -31,8 +31,8 @@ export class AdminauthService {
         });
       }
       const hash = bcrypt.hashSync(data.password, 10);
-      const newAdmin = await this.prisma.admin.create({
-        data: { ...data, password: hash },
+      const newAdmin = await this.prisma.user.create({
+        data: { ...data, password: hash, verified: 1 },
       });
       const token = this.jwt.sign({ id: newAdmin.id, role: data.role });
       return {
@@ -52,7 +52,7 @@ export class AdminauthService {
 
   async login(data: LoginAdminDto) {
     try {
-      const admin = await this.prisma.admin.findUnique({
+      const admin = await this.prisma.user.findUnique({
         where: { email: data.email },
       });
       if (!admin) {
