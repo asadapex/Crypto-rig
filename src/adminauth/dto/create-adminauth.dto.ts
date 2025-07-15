@@ -7,6 +7,14 @@ export class CreateAdminDto {
   @IsString()
   name: string;
 
+  @ApiProperty({ type: String, example: 'John' })
+  @IsString()
+  surname: string;
+
+  @ApiProperty({ type: String, example: '+998901234567' })
+  @IsString()
+  phoneNumber: string;
+
   @ApiProperty({ type: String, example: 'johndoe@gmail.com' })
   @IsEmail()
   email: string;
