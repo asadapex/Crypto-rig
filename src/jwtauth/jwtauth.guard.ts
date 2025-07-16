@@ -11,31 +11,30 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    private readonly jwt: JwtService,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly jwt: JwtService) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest();
-    const token = req.headers.authorization?.split(' ')?.[1];
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new UnauthorizedException({
         data: [],
-        messages: ['Token not provided'],
+        messages: ['Token not provided or badly formatted'],
         statusCode: 401,
         time: new Date(),
       });
     }
 
+    const token = authHeader.split(' ')[1];
+
     try {
       const data = this.jwt.verify(token);
       req['user-id'] = data.id;
       req['user-role'] = data.role;
-
       return true;
     } catch (error) {
-      if (error != UnauthorizedException) {
+      if (!(error instanceof UnauthorizedException)) {
         throw error;
       }
       throw new UnauthorizedException({
