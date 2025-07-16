@@ -37,6 +37,7 @@ export class AuthGuard implements CanActivate {
       if (!(error instanceof UnauthorizedException)) {
         throw error;
       }
+      console.log(error);
       throw new UnauthorizedException({
         data: [],
         messages: ['Wrong credentials'],
