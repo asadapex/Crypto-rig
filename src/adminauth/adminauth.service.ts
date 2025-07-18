@@ -128,6 +128,24 @@ export class AdminauthService {
     }
   }
 
+  async withdrawReqView() {
+    try {
+      const all = await this.prisma.withdraw.findMany();
+      return {
+        data: [all],
+        messages: [],
+        statusCode: 200,
+        time: new Date(),
+      };
+    } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException({ message: 'Server error' });
+    }
+  }
+
   async withdrawReq(data: WithdrawReq) {
     try {
       const one = await this.prisma.withdraw.findUnique({

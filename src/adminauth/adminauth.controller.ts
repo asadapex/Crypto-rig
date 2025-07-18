@@ -31,8 +31,13 @@ export class AdminauthController {
     return this.adminauthService.findMe(req);
   }
 
-  @Post("withdraw-req")
-  withdrawReq(@Body() data: WithdrawReq){
-    return this.adminauthService.withdrawReq(data)
+  @Get('withdraw-req')
+  withdrawReqView() {
+    return this.adminauthService.withdrawReqView();
+  }
+
+  @Post('withdraw-req')
+  withdrawReq(@Body() data: WithdrawReq) {
+    return this.adminauthService.withdrawReq(data);
   }
 }
