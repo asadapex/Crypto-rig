@@ -4,6 +4,7 @@ import { CreateAdminDto } from './dto/create-adminauth.dto';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { AuthGuard } from 'src/jwtauth/jwtauth.guard';
 import { Request } from 'express';
+import { WithdrawReq } from './dto/withdraw-status.dto';
 
 @Controller('admin')
 export class AdminauthController {
@@ -28,5 +29,10 @@ export class AdminauthController {
   @Get('profile')
   findMe(@Req() req: Request) {
     return this.adminauthService.findMe(req);
+  }
+
+  @Post("withdraw-req")
+  withdrawReq(@Body() data: WithdrawReq){
+    return this.adminauthService.withdrawReq(data)
   }
 }

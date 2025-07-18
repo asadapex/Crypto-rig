@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { Request } from 'express';
+import { WithdrawReq } from './dto/withdraw-status.dto';
 
 @Injectable()
 export class AdminauthService {
@@ -123,6 +124,39 @@ export class AdminauthService {
         throw error;
       }
       console.log(error);
+      throw new InternalServerErrorException({ message: 'Server error' });
+    }
+  }
+
+  async withdrawReq(data: WithdrawReq) {
+    try {
+      const one = await this.prisma.withdraw.findUnique({
+        where: { id: data.id },
+      });
+      if (!one) {
+        throw new NotFoundException({
+          data: [],
+          messages: ['Withdraw request not found'],
+          statusCode: 404,
+          time: new Date(),
+        });
+      }
+
+      const updated = await this.prisma.withdraw.update({
+        where: { id: data.id },
+        data,
+      });
+      return {
+        data: [updated],
+        messages: ['Withdraw request updated'],
+        statusCode: 200,
+        time: new Date(),
+      };
+    } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException({ message: 'Server error' });
     }
   }
