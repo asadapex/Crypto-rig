@@ -157,6 +157,7 @@ export class UsersService {
       await this.prisma.withdraw.create({
         data: {
           amount: data.amount,
+          reciept: data.reciept,
           type: WithdrawType.TOPUP,
           paymentMethod: data.paymentMethod,
           status: WithdrawStatus.PENDING,

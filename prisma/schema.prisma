@@ -66,6 +66,7 @@ model Withdraw {
   user          User           @relation(fields: [userId], references: [id])
   userId        String
   amount        Float
+  reciept       String         @default("")
   paymentMethod PaymentMethod  @default(VISA)
   type          WithdrawType   @default(WITHDRAW)
   status        WithdrawStatus @default(PENDING)
