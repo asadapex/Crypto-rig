@@ -127,6 +127,9 @@ export class UsersService {
         time: new Date(),
       };
     } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
       console.log(error);
     }
   }
