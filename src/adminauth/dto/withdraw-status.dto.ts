@@ -1,6 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WithdrawStatus } from '@prisma/client';
-import { IsEnum, IsUUID } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  ValidateIf,
+} from 'class-validator';
 
 export class WithdrawReq {
   @ApiProperty({ type: String, example: 'uuid' })
@@ -10,4 +16,13 @@ export class WithdrawReq {
   @ApiProperty({ enum: WithdrawStatus, example: WithdrawStatus.PENDING })
   @IsEnum(WithdrawStatus)
   status: WithdrawStatus;
+
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Your request was rejected due to policy violation.',
+  })
+  @ValidateIf((o) => o.status === WithdrawStatus.REJECTED)
+  @IsString()
+  @IsNotEmpty()
+  description?: string;
 }

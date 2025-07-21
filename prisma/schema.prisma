@@ -70,6 +70,7 @@ model Withdraw {
   paymentMethod PaymentMethod  @default(VISA)
   type          WithdrawType   @default(WITHDRAW)
   status        WithdrawStatus @default(PENDING)
+  description   String?
 }
 
 model UserVideoCard {
