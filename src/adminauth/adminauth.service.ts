@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { Request } from 'express';
 import { WithdrawReq } from './dto/withdraw-status.dto';
+import { WithdrawStatus, WithdrawType } from '@prisma/client';
 
 @Injectable()
 export class AdminauthService {
@@ -157,6 +158,26 @@ export class AdminauthService {
           messages: ['Withdraw request not found'],
           statusCode: 404,
           time: new Date(),
+        });
+      }
+
+      if (
+        one.type === WithdrawType.TOPUP &&
+        data.status === WithdrawStatus.ACCEPTED
+      ) {
+        await this.prisma.user.update({
+          where: { id: one.userId },
+          data: {
+            balance: {
+              increment: one.amount / 100000,
+            },
+          },
+        });
+        await this.prisma.withdraw.update({
+          where: { id: data.id },
+          data: {
+            status: WithdrawStatus.ACCEPTED,
+          },
         });
       }
 
