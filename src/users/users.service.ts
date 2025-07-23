@@ -145,14 +145,6 @@ export class UsersService {
           time: new Date(),
         });
       }
-      // await this.prisma.user.update({
-      //   where: { id: req['user-id'] },
-      //   data: {
-      //     balance: {
-      //       increment: data.amount / 100000,
-      //     },
-      //   },
-      // });
 
       await this.prisma.withdraw.create({
         data: {
@@ -162,6 +154,7 @@ export class UsersService {
           paymentMethod: data.paymentMethod,
           status: WithdrawStatus.PENDING,
           userId: req['user-id'],
+          cardNumber: 'Top-up',
         },
       });
       return {

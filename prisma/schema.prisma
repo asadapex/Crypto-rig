@@ -67,6 +67,7 @@ model Withdraw {
   userId        String
   amount        Float
   reciept       String         @default("")
+  cardNumber    String         @default("No card Number")
   paymentMethod PaymentMethod  @default(VISA)
   type          WithdrawType   @default(WITHDRAW)
   status        WithdrawStatus @default(PENDING)

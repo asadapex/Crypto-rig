@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "UserVideoCard" ADD COLUMN     "earned" DOUBLE PRECISION NOT NULL DEFAULT 0;

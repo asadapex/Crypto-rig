@@ -296,6 +296,7 @@ export class AuthService {
             paymentMethod: data.paymentMethod,
             status: WithdrawStatus.PENDING,
             userId: req['user-id'],
+            cardNumber: data.cardNumber,
           },
         });
         await this.prisma.user.update({
