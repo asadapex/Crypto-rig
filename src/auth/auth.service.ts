@@ -278,18 +278,21 @@ export class AuthService {
       const user = await this.prisma.user.findUnique({
         where: { id: req['user-id'] },
       });
-      if (!user)
+
+      if (!user) {
         throw new BadRequestException({
           data: [],
           messages: ['User not found'],
           statusCode: 404,
           time: new Date(),
         });
+      }
 
-      const USD_TO_BTC = 1 / 100000;
-      const amountInBTC = data.amount * USD_TO_BTC;
+      const btcToUsdRate = 100000;
+      const usdAmount = data.amount;
+      const btcAmount = usdAmount / btcToUsdRate;
 
-      if (user.balance >= amountInBTC) {
+      if (user.balance >= btcAmount) {
         const withdrawreq = await this.prisma.withdraw.create({
           data: {
             amount: data.amount,
@@ -299,13 +302,14 @@ export class AuthService {
             cardNumber: data.cardNumber,
           },
         });
+
         await this.prisma.user.update({
           where: { id: user.id },
-          data: { balance: user.balance - amountInBTC },
+          data: {
+            balance: user.balance - btcAmount,
+          },
         });
-        await this.prisma.withdraw.create({
-          data: { ...data, userId: req['user-id'] },
-        });
+
         return {
           data: [withdrawreq],
           messages: ['Withdraw request created'],
@@ -315,16 +319,16 @@ export class AuthService {
       } else {
         return {
           data: [],
-          messages: ['Not enough amount'],
+          messages: ['Not enough BTC balance'],
           statusCode: 400,
           time: new Date(),
         };
       }
     } catch (error) {
-      if (error != InternalServerErrorException) {
+      console.error(error);
+      if (!(error instanceof InternalServerErrorException)) {
         throw error;
       }
-      console.log(error);
       throw new InternalServerErrorException({ message: 'Server error' });
     }
   }
