@@ -179,14 +179,33 @@ export class AdminauthService {
             status: WithdrawStatus.ACCEPTED,
           },
         });
+      } else if (
+        one.type === WithdrawType.WITHDRAW &&
+        data.status === WithdrawStatus.ACCEPTED
+      ) {
+        await this.prisma.user.update({
+          where: { id: one.userId },
+          data: {
+            balance: {
+              decrement: one.amount / 100000,
+            },
+          },
+        });
+        await this.prisma.withdraw.update({
+          where: { id: data.id },
+          data: {
+            status: WithdrawStatus.ACCEPTED,
+          },
+        });
+      } else {
+        await this.prisma.withdraw.update({
+          where: { id: data.id },
+          data,
+        });
       }
 
-      const updated = await this.prisma.withdraw.update({
-        where: { id: data.id },
-        data,
-      });
       return {
-        data: [updated],
+        data: [],
         messages: ['Withdraw request updated'],
         statusCode: 200,
         time: new Date(),
