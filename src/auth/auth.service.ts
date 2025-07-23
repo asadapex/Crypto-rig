@@ -15,13 +15,21 @@ import { VdcardStatusDto } from './dto/vdcard-status.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import { UserRole, WithdrawStatus } from '@prisma/client';
 import { CollectUserBalanceDto } from './dto/collect-balance.dto';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly httpService: HttpService,
   ) {}
+
+  async getBtcToUsdRate(): Promise<number> {
+    const url = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+    const response = await this.httpService.axiosRef.get(url);
+    return parseFloat(response.data.price); // 60421.23
+  }
 
   async findUser(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
@@ -288,9 +296,8 @@ export class AuthService {
         });
       }
 
-      const btcToUsdRate = 100000;
-      const usdAmount = data.amount;
-      const btcAmount = usdAmount / btcToUsdRate;
+      const btcToUsdRate = await this.getBtcToUsdRate();
+      const btcAmount = data.amount / btcToUsdRate;
 
       if (user.balance >= btcAmount) {
         const withdrawreq = await this.prisma.withdraw.create({
