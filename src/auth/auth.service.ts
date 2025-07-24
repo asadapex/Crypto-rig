@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
-import { UserRole, WithdrawStatus } from '@prisma/client';
+import { UserRole, WithdrawStatus, WithdrawType } from '@prisma/client';
 import { CollectUserBalanceDto } from './dto/collect-balance.dto';
 import { HttpService } from '@nestjs/axios';
 
@@ -288,7 +288,7 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new BadRequestException({
+        throw new NotFoundException({
           data: [],
           messages: ['User not found'],
           statusCode: 404,
@@ -306,12 +306,12 @@ export class AuthService {
       const btcAmount = parseFloat((data.amount / btcToUsdRate).toFixed(8));
 
       if (user.balance < btcAmount) {
-        return {
+        throw new BadRequestException({
           data: [],
           messages: ['Not enough BTC balance'],
           statusCode: 400,
           time: new Date(),
-        };
+        });
       }
 
       const withdrawreq = await this.prisma.withdraw.create({
@@ -321,15 +321,7 @@ export class AuthService {
           status: WithdrawStatus.PENDING,
           userId: user.id,
           cardNumber: data.cardNumber,
-        },
-      });
-
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: {
-          balance: {
-            decrement: btcAmount,
-          },
+          type: WithdrawType.WITHDRAW,
         },
       });
 

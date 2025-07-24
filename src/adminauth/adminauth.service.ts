@@ -12,13 +12,22 @@ import { LoginAdminDto } from './dto/login-admin.dto';
 import { Request } from 'express';
 import { WithdrawReq } from './dto/withdraw-status.dto';
 import { WithdrawStatus, WithdrawType } from '@prisma/client';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AdminauthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly httpService: HttpService,
   ) {}
+
+  async getBtcToUsdRate(): Promise<number> {
+    const url = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+    const response = await this.httpService.axiosRef.get(url);
+    return parseFloat(response.data.price);
+  }
+
   async create(data: CreateAdminDto) {
     try {
       const admin = await this.prisma.user.findUnique({
@@ -149,10 +158,11 @@ export class AdminauthService {
 
   async withdrawReq(data: WithdrawReq) {
     try {
-      const one = await this.prisma.withdraw.findUnique({
+      const withdraw = await this.prisma.withdraw.findUnique({
         where: { id: data.id },
       });
-      if (!one) {
+
+      if (!withdraw) {
         throw new NotFoundException({
           data: [],
           messages: ['Withdraw request not found'],
@@ -161,48 +171,35 @@ export class AdminauthService {
         });
       }
 
-      if (
-        one.type === WithdrawType.TOPUP &&
-        data.status === WithdrawStatus.ACCEPTED
-      ) {
+      if (data.status === WithdrawStatus.ACCEPTED) {
+        const btcToUsdRate = await this.getBtcToUsdRate();
+        if (!btcToUsdRate || isNaN(btcToUsdRate)) {
+          throw new InternalServerErrorException({
+            message: 'Unable to fetch BTC rate',
+          });
+        }
+
+        const btcAmount = parseFloat(
+          (withdraw.amount / btcToUsdRate).toFixed(8),
+        );
+
+        const updateBalance =
+          withdraw.type === WithdrawType.TOPUP
+            ? { increment: btcAmount }
+            : { decrement: btcAmount };
+
         await this.prisma.user.update({
-          where: { id: one.userId },
+          where: { id: withdraw.userId },
           data: {
-            balance: {
-              increment: one.amount / 100000,
-            },
+            balance: updateBalance,
           },
-        });
-        await this.prisma.withdraw.update({
-          where: { id: data.id },
-          data: {
-            status: WithdrawStatus.ACCEPTED,
-          },
-        });
-      } else if (
-        one.type === WithdrawType.WITHDRAW &&
-        data.status === WithdrawStatus.ACCEPTED
-      ) {
-        await this.prisma.user.update({
-          where: { id: one.userId },
-          data: {
-            balance: {
-              decrement: one.amount / 100000,
-            },
-          },
-        });
-        await this.prisma.withdraw.update({
-          where: { id: data.id },
-          data: {
-            status: WithdrawStatus.ACCEPTED,
-          },
-        });
-      } else {
-        await this.prisma.withdraw.update({
-          where: { id: data.id },
-          data,
         });
       }
+
+      await this.prisma.withdraw.update({
+        where: { id: data.id },
+        data: { status: data.status },
+      });
 
       return {
         data: [],
@@ -211,10 +208,7 @@ export class AdminauthService {
         time: new Date(),
       };
     } catch (error) {
-      if (error != InternalServerErrorException) {
-        throw error;
-      }
-
+      console.error(error);
       throw new InternalServerErrorException({ message: 'Server error' });
     }
   }
