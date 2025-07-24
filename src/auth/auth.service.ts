@@ -28,7 +28,7 @@ export class AuthService {
   async getBtcToUsdRate(): Promise<number> {
     const url = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
     const response = await this.httpService.axiosRef.get(url);
-    return parseFloat(response.data.price); // 60421.23
+    return parseFloat(response.data.price);
   }
 
   async findUser(email: string) {
@@ -313,7 +313,9 @@ export class AuthService {
         await this.prisma.user.update({
           where: { id: user.id },
           data: {
-            balance: user.balance - btcAmount,
+            balance: {
+              decrement: btcAmount,
+            },
           },
         });
 
