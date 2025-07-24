@@ -332,6 +332,9 @@ export class AuthService {
         time: new Date(),
       };
     } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
       console.error(error);
       throw new InternalServerErrorException({ message: 'Server error' });
     }
