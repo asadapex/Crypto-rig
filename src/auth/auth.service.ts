@@ -297,35 +297,15 @@ export class AuthService {
       }
 
       const btcToUsdRate = await this.getBtcToUsdRate();
-      const btcAmount = data.amount / btcToUsdRate;
-
-      if (user.balance >= btcAmount) {
-        const withdrawreq = await this.prisma.withdraw.create({
-          data: {
-            amount: data.amount,
-            paymentMethod: data.paymentMethod,
-            status: WithdrawStatus.PENDING,
-            userId: req['user-id'],
-            cardNumber: data.cardNumber,
-          },
+      if (!btcToUsdRate || isNaN(btcToUsdRate)) {
+        throw new InternalServerErrorException({
+          message: 'Unable to fetch BTC rate',
         });
+      }
 
-        await this.prisma.user.update({
-          where: { id: user.id },
-          data: {
-            balance: {
-              decrement: btcAmount,
-            },
-          },
-        });
+      const btcAmount = parseFloat((data.amount / btcToUsdRate).toFixed(8));
 
-        return {
-          data: [withdrawreq],
-          messages: ['Withdraw request created'],
-          statusCode: 200,
-          time: new Date(),
-        };
-      } else {
+      if (user.balance < btcAmount) {
         return {
           data: [],
           messages: ['Not enough BTC balance'],
@@ -333,11 +313,34 @@ export class AuthService {
           time: new Date(),
         };
       }
+
+      const withdrawreq = await this.prisma.withdraw.create({
+        data: {
+          amount: data.amount,
+          paymentMethod: data.paymentMethod,
+          status: WithdrawStatus.PENDING,
+          userId: user.id,
+          cardNumber: data.cardNumber,
+        },
+      });
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          balance: {
+            decrement: btcAmount,
+          },
+        },
+      });
+
+      return {
+        data: [withdrawreq],
+        messages: ['Withdraw request created'],
+        statusCode: 200,
+        time: new Date(),
+      };
     } catch (error) {
       console.error(error);
-      if (!(error instanceof InternalServerErrorException)) {
-        throw error;
-      }
       throw new InternalServerErrorException({ message: 'Server error' });
     }
   }
