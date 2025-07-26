@@ -50,8 +50,8 @@ export class AdminauthController {
     return this.adminauthService.withdrawReq(data);
   }
 
-  @Delete('delete-history')
-  deleteHistory(@Param() id: string) {
+  @Delete('delete-history:id')
+  deleteHistory(@Param('id') id: string) {
     return this.adminauthService.deleteHistory(id);
   }
 }
