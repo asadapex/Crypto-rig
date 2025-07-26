@@ -198,7 +198,7 @@ export class AdminauthService {
 
       await this.prisma.withdraw.update({
         where: { id: data.id },
-        data: { status: data.status },
+        data,
       });
 
       return {
