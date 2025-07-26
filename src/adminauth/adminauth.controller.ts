@@ -40,4 +40,9 @@ export class AdminauthController {
   withdrawReq(@Body() data: WithdrawReq) {
     return this.adminauthService.withdrawReq(data);
   }
+
+  @Post('delete-history')
+  deleteHistory(@Body() id: string) {
+    return this.adminauthService.deleteHistory(id);
+  }
 }

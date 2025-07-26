@@ -215,4 +215,36 @@ export class AdminauthService {
       throw new InternalServerErrorException({ message: 'Server error' });
     }
   }
+
+  async deleteHistory(id: string) {
+    try {
+      const withdraw = await this.prisma.withdraw.findUnique({
+        where: { id },
+      });
+
+      if (!withdraw) {
+        throw new NotFoundException({
+          data: [],
+          messages: ['Withdraw request not found'],
+          statusCode: 404,
+          time: new Date(),
+        });
+      }
+      await this.prisma.withdraw.delete({
+        where: { id },
+      });
+      return {
+        data: [],
+        messages: ['Withdraw request deleted'],
+        statusCode: 200,
+        time: new Date(),
+      };
+    } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
+      console.error(error);
+      throw new InternalServerErrorException({ message: 'Server error' });
+    }
+  }
 }
