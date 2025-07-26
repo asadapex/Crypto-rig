@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Delete,
+  Param,
+} from '@nestjs/common';
 import { AdminauthService } from './adminauth.service';
 import { CreateAdminDto } from './dto/create-adminauth.dto';
 import { LoginAdminDto } from './dto/login-admin.dto';
@@ -41,8 +50,8 @@ export class AdminauthController {
     return this.adminauthService.withdrawReq(data);
   }
 
-  @Post('delete-history')
-  deleteHistory(@Body() id: string) {
+  @Delete('delete-history')
+  deleteHistory(@Param() id: string) {
     return this.adminauthService.deleteHistory(id);
   }
 }
