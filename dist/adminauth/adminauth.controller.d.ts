@@ -2,6 +2,7 @@ import { AdminauthService } from './adminauth.service';
 import { CreateAdminDto } from './dto/create-adminauth.dto';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { Request } from 'express';
+import { WithdrawReq } from './dto/withdraw-status.dto';
 export declare class AdminauthController {
     private readonly adminauthService;
     constructor(adminauthService: AdminauthService);
@@ -21,6 +22,13 @@ export declare class AdminauthController {
         statusCode: number;
         time: Date;
     }>;
+    findAll(): Promise<{
+        email: string;
+        password: string;
+        name: string;
+        id: string;
+        role: import(".prisma/client").$Enums.UserRole;
+    }[]>;
     findMe(req: Request): Promise<{
         data: {
             id: string;
@@ -29,6 +37,34 @@ export declare class AdminauthController {
             role: import(".prisma/client").$Enums.UserRole;
         }[];
         messages: never[];
+        statusCode: number;
+        time: Date;
+    }>;
+    withdrawReqView(): Promise<{
+        data: {
+            type: import(".prisma/client").$Enums.WithdrawType;
+            description: string | null;
+            id: string;
+            status: import(".prisma/client").$Enums.WithdrawStatus;
+            amount: number;
+            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            cardNumber: string;
+            userId: string;
+            reciept: string;
+        }[][];
+        messages: never[];
+        statusCode: number;
+        time: Date;
+    }>;
+    withdrawReq(data: WithdrawReq): Promise<{
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
+    deleteHistory(id: string): Promise<{
+        data: never[];
+        messages: string[];
         statusCode: number;
         time: Date;
     }>;

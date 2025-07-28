@@ -13,7 +13,7 @@ exports.BuyVideoCardDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class BuyVideoCardDto {
-    type;
+    videoCardId;
     count;
 }
 exports.BuyVideoCardDto = BuyVideoCardDto;
@@ -21,7 +21,7 @@ __decorate([
     (0, swagger_1.ApiProperty)({ type: String, example: 'uuid' }),
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
-], BuyVideoCardDto.prototype, "type", void 0);
+], BuyVideoCardDto.prototype, "videoCardId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: Number, example: 1 }),
     (0, class_validator_1.IsInt)(),

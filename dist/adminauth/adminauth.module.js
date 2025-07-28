@@ -10,11 +10,13 @@ exports.AdminauthModule = void 0;
 const common_1 = require("@nestjs/common");
 const adminauth_service_1 = require("./adminauth.service");
 const adminauth_controller_1 = require("./adminauth.controller");
+const axios_1 = require("@nestjs/axios");
 let AdminauthModule = class AdminauthModule {
 };
 exports.AdminauthModule = AdminauthModule;
 exports.AdminauthModule = AdminauthModule = __decorate([
     (0, common_1.Module)({
+        imports: [axios_1.HttpModule],
         controllers: [adminauth_controller_1.AdminauthController],
         providers: [adminauth_service_1.AdminauthService],
     })

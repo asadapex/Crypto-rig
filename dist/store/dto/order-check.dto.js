@@ -9,32 +9,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WithdrawDto = void 0;
+exports.OrderCheckDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
-class WithdrawDto {
-    amount;
-    paymentMethod;
-    cardNumber;
+class OrderCheckDto {
+    status;
+    description;
 }
-exports.WithdrawDto = WithdrawDto;
+exports.OrderCheckDto = OrderCheckDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Number, example: 100 }),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], WithdrawDto.prototype, "amount", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ enum: client_1.PaymentMethod, example: client_1.PaymentMethod.MASTERCARD }),
-    (0, class_validator_1.IsEnum)(client_1.PaymentMethod),
+    (0, swagger_1.ApiProperty)({ enum: client_1.OrderStatus, example: client_1.OrderStatus.ACCEPTED }),
+    (0, class_validator_1.IsEnum)(client_1.OrderStatus),
     __metadata("design:type", String)
-], WithdrawDto.prototype, "paymentMethod", void 0);
+], OrderCheckDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        enum: String,
-        example: 'card number or crypto wallet address',
+    (0, swagger_1.ApiPropertyOptional)({
+        type: String,
+        example: 'Your request was rejected due to policy violation.',
     }),
+    (0, class_validator_1.ValidateIf)((o) => o.status === client_1.OrderStatus.REJECTED),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], WithdrawDto.prototype, "cardNumber", void 0);
-//# sourceMappingURL=withdraw.dto.js.map
+], OrderCheckDto.prototype, "description", void 0);
+//# sourceMappingURL=order-check.dto.js.map

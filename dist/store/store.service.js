@@ -12,12 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StoreService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const client_1 = require("@prisma/client");
 let StoreService = class StoreService {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async buyCards(userId, dtos) {
+    async buyCards(userId, data) {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
         if (!user)
             throw new common_1.NotFoundException({
@@ -34,34 +35,127 @@ let StoreService = class StoreService {
                 time: new Date(),
             });
         }
-        for (const dto of dtos) {
-            const videoCard = await this.prisma.videoCard.findUnique({
-                where: {
-                    id: dto.type,
-                },
+        const vdcard = await this.prisma.videoCard.findUnique({
+            where: { id: data.videoCardId },
+        });
+        if (!vdcard) {
+            throw new common_1.NotFoundException({
+                data: [],
+                messages: ['Video Card not found'],
+                statusCode: 404,
+                time: new Date(),
             });
-            if (!videoCard) {
+        }
+        await this.prisma.order.create({
+            data: {
+                userId,
+                videoCardId: data.videoCardId,
+                count: data.count,
+                status: client_1.OrderStatus.PENDING,
+            },
+        });
+        return {
+            data: [],
+            messages: ['Order created'],
+            statusCode: 200,
+            time: new Date(),
+        };
+    }
+    async myOrders(userId) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user)
+            throw new common_1.NotFoundException({
+                data: [],
+                messages: ['User not found'],
+                statusCode: 404,
+                time: new Date(),
+            });
+        if (user.verified === 0) {
+            throw new common_1.BadRequestException({
+                data: [],
+                messages: ['User has not verified'],
+                statusCode: 400,
+                time: new Date(),
+            });
+        }
+        const all = await this.prisma.order.findMany({
+            where: { userId },
+        });
+        return {
+            data: all,
+            messages: [],
+            statusCode: 200,
+            time: new Date(),
+        };
+    }
+    async checkOrder(id, data) {
+        try {
+            const order = await this.prisma.order.findUnique({ where: { id } });
+            if (!order) {
                 throw new common_1.NotFoundException({
                     data: [],
-                    messages: [`Video card not found: ${dto.type}`],
+                    messages: ['Order not found'],
                     statusCode: 404,
                     time: new Date(),
                 });
             }
-            const createManyData = Array.from({ length: dto.count }).map(() => ({
-                userId,
-                videoCardId: videoCard.id,
-            }));
-            await this.prisma.userVideoCard.createMany({
-                data: createManyData,
+            if (data.status === client_1.OrderStatus.ACCEPTED) {
+                await this.prisma.order.update({
+                    where: { id },
+                    data: { status: data.status },
+                });
+                const vdcard = await this.prisma.videoCard.findUnique({
+                    where: { id: order.videoCardId },
+                });
+                if (!vdcard) {
+                    throw new common_1.NotFoundException({
+                        data: [],
+                        messages: ['Video Card not found'],
+                        statusCode: 404,
+                        time: new Date(),
+                    });
+                }
+                for (let i = 0; i < order.count; i++) {
+                    await this.prisma.userVideoCard.create({
+                        data: {
+                            userId: order.userId,
+                            videoCardId: order.videoCardId,
+                        },
+                    });
+                }
+                return {
+                    data: [],
+                    messages: ['Order accepted'],
+                    statusCode: 200,
+                    time: new Date(),
+                };
+            }
+            if (data.status === client_1.OrderStatus.REJECTED) {
+                await this.prisma.order.update({
+                    where: { id },
+                    data: { status: data.status, description: data.description },
+                });
+                return {
+                    data: [],
+                    messages: ['Order rejected'],
+                    statusCode: 200,
+                    time: new Date(),
+                };
+            }
+            throw new common_1.BadRequestException({
+                data: [],
+                messages: ['Wrong status'],
+                statusCode: 400,
+                time: new Date(),
             });
         }
-        return {
-            data: [],
-            messages: ['Video cards added'],
-            statusCode: 200,
-            time: new Date(),
-        };
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.log(error);
+            throw new common_1.InternalServerErrorException({ message: 'Server error' });
+        }
     }
 };
 exports.StoreService = StoreService;

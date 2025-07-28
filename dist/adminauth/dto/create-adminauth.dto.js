@@ -15,6 +15,8 @@ const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
 class CreateAdminDto {
     name;
+    surname;
+    phoneNumber;
     email;
     password;
     role;
@@ -25,6 +27,16 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateAdminDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, example: 'John' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateAdminDto.prototype, "surname", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, example: '+998901234567' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateAdminDto.prototype, "phoneNumber", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: String, example: 'johndoe@gmail.com' }),
     (0, class_validator_1.IsEmail)(),

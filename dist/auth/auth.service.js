@@ -15,12 +15,20 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
 const jwt_1 = require("@nestjs/jwt");
 const client_1 = require("@prisma/client");
+const axios_1 = require("@nestjs/axios");
 let AuthService = class AuthService {
     prisma;
     jwt;
-    constructor(prisma, jwt) {
+    httpService;
+    constructor(prisma, jwt, httpService) {
         this.prisma = prisma;
         this.jwt = jwt;
+        this.httpService = httpService;
+    }
+    async getBtcToUsdRate() {
+        const url = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+        const response = await this.httpService.axiosRef.get(url);
+        return parseFloat(response.data.price);
     }
     async findUser(email) {
         const user = await this.prisma.user.findUnique({ where: { email } });
@@ -259,52 +267,51 @@ let AuthService = class AuthService {
             const user = await this.prisma.user.findUnique({
                 where: { id: req['user-id'] },
             });
-            if (!user)
-                throw new common_1.BadRequestException({
+            if (!user) {
+                throw new common_1.NotFoundException({
                     data: [],
                     messages: ['User not found'],
                     statusCode: 404,
                     time: new Date(),
                 });
-            const USD_TO_BTC = 1 / 100000;
-            const amountInBTC = data.amount * USD_TO_BTC;
-            if (user.balance >= amountInBTC) {
-                const withdrawreq = await this.prisma.withdraw.create({
-                    data: {
-                        amount: data.amount,
-                        paymentMethod: data.paymentMethod,
-                        status: client_1.WithdrawStatus.PENDING,
-                        userId: req['user-id'],
-                    },
-                });
-                await this.prisma.user.update({
-                    where: { id: user.id },
-                    data: { balance: user.balance - amountInBTC },
-                });
-                await this.prisma.withdraw.create({
-                    data: { ...data, userId: req['user-id'] },
-                });
-                return {
-                    data: [withdrawreq],
-                    messages: ['Withdraw request created'],
-                    statusCode: 200,
-                    time: new Date(),
-                };
             }
-            else {
-                return {
+            const btcToUsdRate = await this.getBtcToUsdRate();
+            if (!btcToUsdRate || isNaN(btcToUsdRate)) {
+                throw new common_1.InternalServerErrorException({
+                    message: 'Unable to fetch BTC rate',
+                });
+            }
+            const btcAmount = parseFloat((data.amount / btcToUsdRate).toFixed(8));
+            if (user.balance < btcAmount) {
+                throw new common_1.BadRequestException({
                     data: [],
-                    messages: ['Not enough amount'],
+                    messages: ['Not enough BTC balance'],
                     statusCode: 400,
                     time: new Date(),
-                };
+                });
             }
+            const withdrawreq = await this.prisma.withdraw.create({
+                data: {
+                    amount: data.amount,
+                    paymentMethod: data.paymentMethod,
+                    status: client_1.WithdrawStatus.PENDING,
+                    userId: user.id,
+                    cardNumber: data.cardNumber,
+                    type: client_1.WithdrawType.WITHDRAW,
+                },
+            });
+            return {
+                data: [withdrawreq],
+                messages: ['Withdraw request created'],
+                statusCode: 200,
+                time: new Date(),
+            };
         }
         catch (error) {
             if (error != common_1.InternalServerErrorException) {
                 throw error;
             }
-            console.log(error);
+            console.error(error);
             throw new common_1.InternalServerErrorException({ message: 'Server error' });
         }
     }
@@ -364,6 +371,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        axios_1.HttpService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -108,7 +108,7 @@ export declare class UsersService {
         messages: string[];
         statusCode: number;
         time: Date;
-    }>;
+    } | undefined>;
     topupBalance(req: Request, data: TopupBalanceDto): Promise<{
         data: never[];
         messages: string[];

@@ -12,25 +12,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
-const prisma_service_1 = require("../prisma/prisma.service");
 let AuthGuard = class AuthGuard {
     jwt;
-    prisma;
-    constructor(jwt, prisma) {
+    constructor(jwt) {
         this.jwt = jwt;
-        this.prisma = prisma;
     }
     async canActivate(context) {
         const req = context.switchToHttp().getRequest();
-        const token = req.headers.authorization?.split(' ')?.[1];
-        if (!token) {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
             throw new common_1.UnauthorizedException({
                 data: [],
-                messages: ['Token not provided'],
+                messages: ['Token not provided or badly formatted'],
                 statusCode: 401,
                 time: new Date(),
             });
         }
+        const token = authHeader.split(' ')[1];
         try {
             const data = this.jwt.verify(token);
             req['user-id'] = data.id;
@@ -38,9 +36,10 @@ let AuthGuard = class AuthGuard {
             return true;
         }
         catch (error) {
-            if (error != common_1.UnauthorizedException) {
+            if (!(error instanceof common_1.UnauthorizedException)) {
                 throw error;
             }
+            console.log(error);
             throw new common_1.UnauthorizedException({
                 data: [],
                 messages: ['Wrong credentials'],
@@ -53,7 +52,6 @@ let AuthGuard = class AuthGuard {
 exports.AuthGuard = AuthGuard;
 exports.AuthGuard = AuthGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [jwt_1.JwtService,
-        prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [jwt_1.JwtService])
 ], AuthGuard);
 //# sourceMappingURL=jwtauth.guard.js.map

@@ -80,6 +80,14 @@ let UsersService = class UsersService {
                 time: new Date(),
             });
         }
+        if (!updateUserDto || Object.keys(updateUserDto).length === 0) {
+            throw new common_1.BadRequestException({
+                data: [],
+                messages: ['Update data is missing'],
+                statusCode: 400,
+                time: new Date(),
+            });
+        }
         const updated = await this.prisma.user.update({
             where: { id },
             data: updateUserDto,
@@ -92,22 +100,32 @@ let UsersService = class UsersService {
         };
     }
     async remove(id) {
-        const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user) {
-            throw new common_1.NotFoundException({
-                data: [],
-                messages: ['User not found'],
-                statusCode: 404,
+        try {
+            const user = await this.prisma.user.findUnique({ where: { id } });
+            if (!user) {
+                throw new common_1.NotFoundException({
+                    data: [],
+                    messages: ['User not found'],
+                    statusCode: 404,
+                    time: new Date(),
+                });
+            }
+            await this.prisma.withdraw.deleteMany({ where: { userId: id } });
+            await this.prisma.userVideoCard.deleteMany({ where: { userId: id } });
+            const deleted = await this.prisma.user.delete({ where: { id } });
+            return {
+                data: [deleted],
+                messages: ['User deleted'],
+                statusCode: 200,
                 time: new Date(),
-            });
+            };
         }
-        const deleted = await this.prisma.user.delete({ where: { id } });
-        return {
-            data: [deleted],
-            messages: ['User deleted'],
-            statusCode: 200,
-            time: new Date(),
-        };
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.log(error);
+        }
     }
     async topupBalance(req, data) {
         try {
@@ -122,10 +140,12 @@ let UsersService = class UsersService {
             await this.prisma.withdraw.create({
                 data: {
                     amount: data.amount,
+                    reciept: data.reciept,
                     type: client_1.WithdrawType.TOPUP,
                     paymentMethod: data.paymentMethod,
                     status: client_1.WithdrawStatus.PENDING,
                     userId: req['user-id'],
+                    cardNumber: 'Top-up',
                 },
             });
             return {

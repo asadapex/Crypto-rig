@@ -50,6 +50,9 @@ __decorate([
                 cb(null, uniqueName);
             },
         }),
+        limits: {
+            fileSize: 100 * 1024 * 1024,
+        },
     })),
     __param(0, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),

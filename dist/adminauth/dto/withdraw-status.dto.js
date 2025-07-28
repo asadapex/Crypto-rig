@@ -9,32 +9,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WithdrawDto = void 0;
+exports.WithdrawReq = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
-class WithdrawDto {
-    amount;
-    paymentMethod;
-    cardNumber;
+class WithdrawReq {
+    id;
+    status;
+    description;
 }
-exports.WithdrawDto = WithdrawDto;
+exports.WithdrawReq = WithdrawReq;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Number, example: 100 }),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], WithdrawDto.prototype, "amount", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ enum: client_1.PaymentMethod, example: client_1.PaymentMethod.MASTERCARD }),
-    (0, class_validator_1.IsEnum)(client_1.PaymentMethod),
+    (0, swagger_1.ApiProperty)({ type: String, example: 'uuid' }),
+    (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
-], WithdrawDto.prototype, "paymentMethod", void 0);
+], WithdrawReq.prototype, "id", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        enum: String,
-        example: 'card number or crypto wallet address',
+    (0, swagger_1.ApiProperty)({ enum: client_1.WithdrawStatus, example: client_1.WithdrawStatus.PENDING }),
+    (0, class_validator_1.IsEnum)(client_1.WithdrawStatus),
+    __metadata("design:type", String)
+], WithdrawReq.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        type: String,
+        example: 'Your request was rejected due to policy violation.',
     }),
+    (0, class_validator_1.ValidateIf)((o) => o.status === client_1.WithdrawStatus.REJECTED),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], WithdrawDto.prototype, "cardNumber", void 0);
-//# sourceMappingURL=withdraw.dto.js.map
+], WithdrawReq.prototype, "description", void 0);
+//# sourceMappingURL=withdraw-status.dto.js.map

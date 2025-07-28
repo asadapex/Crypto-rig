@@ -17,6 +17,10 @@ const common_1 = require("@nestjs/common");
 const videocard_service_1 = require("./videocard.service");
 const create_videocard_dto_1 = require("./dto/create-videocard.dto");
 const update_videocard_dto_1 = require("./dto/update-videocard.dto");
+const jwtauth_guard_1 = require("../jwtauth/jwtauth.guard");
+const role_guard_1 = require("../role/role.guard");
+const role_decorator_1 = require("../decorators/role-decorator");
+const client_1 = require("@prisma/client");
 let VideocardController = class VideocardController {
     videocardService;
     constructor(videocardService) {
@@ -40,6 +44,9 @@ let VideocardController = class VideocardController {
 };
 exports.VideocardController = VideocardController;
 __decorate([
+    (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(role_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -53,13 +60,16 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], VideocardController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], VideocardController.prototype, "findOne", null);
 __decorate([
+    (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(role_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -68,6 +78,9 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], VideocardController.prototype, "update", null);
 __decorate([
+    (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(role_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

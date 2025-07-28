@@ -15,6 +15,7 @@ const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
 class TopupBalanceDto {
     amount;
+    reciept;
     paymentMethod;
 }
 exports.TopupBalanceDto = TopupBalanceDto;
@@ -23,6 +24,11 @@ __decorate([
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], TopupBalanceDto.prototype, "amount", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, example: 'reciept' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], TopupBalanceDto.prototype, "reciept", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ enum: client_1.PaymentMethod, example: client_1.PaymentMethod.MASTERCARD }),
     (0, class_validator_1.IsEnum)(client_1.PaymentMethod),

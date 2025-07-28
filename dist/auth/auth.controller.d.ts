@@ -66,11 +66,14 @@ export declare class AuthController {
     withdrawBalance(req: Request, data: WithdrawDto): Promise<{
         data: {
             type: import(".prisma/client").$Enums.WithdrawType;
+            description: string | null;
             id: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            cardNumber: string;
             userId: string;
+            reciept: string;
         }[];
         messages: string[];
         statusCode: number;
@@ -79,11 +82,14 @@ export declare class AuthController {
     myWithdraws(req: Request): Promise<{
         data: {
             type: import(".prisma/client").$Enums.WithdrawType;
+            description: string | null;
             id: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            cardNumber: string;
             userId: string;
+            reciept: string;
         }[];
         messages: string[];
         statusCode: number;

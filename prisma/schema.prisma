@@ -19,6 +19,12 @@ enum WithdrawStatus {
   ONREVIEW
 }
 
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 enum PaymentMethod {
   VISA
   MASTERCARD
@@ -59,6 +65,7 @@ model User {
   role          UserRole        @default(USER)
   createdAt     DateTime        @default(now())
   Withdraw      Withdraw[]
+  Order         Order[]
 }
 
 model Withdraw {
@@ -104,4 +111,16 @@ model VideoCard {
   price           Int             @default(0)
   createdAt       DateTime        @default(now())
   UserVideoCard   UserVideoCard[]
+  Order           Order[]
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  user        User        @relation(fields: [userId], references: [id])
+  userId      String
+  videoCard   VideoCard   @relation(fields: [videoCardId], references: [id])
+  videoCardId String
+  count       Int
+  status      OrderStatus
+  description String?
 }

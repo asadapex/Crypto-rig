@@ -14,16 +14,25 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
 const jwt_1 = require("@nestjs/jwt");
+const client_1 = require("@prisma/client");
+const axios_1 = require("@nestjs/axios");
 let AdminauthService = class AdminauthService {
     prisma;
     jwt;
-    constructor(prisma, jwt) {
+    httpService;
+    constructor(prisma, jwt, httpService) {
         this.prisma = prisma;
         this.jwt = jwt;
+        this.httpService = httpService;
+    }
+    async getBtcToUsdRate() {
+        const url = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+        const response = await this.httpService.axiosRef.get(url);
+        return parseFloat(response.data.price);
     }
     async create(data) {
         try {
-            const admin = await this.prisma.admin.findUnique({
+            const admin = await this.prisma.user.findUnique({
                 where: { email: data.email },
             });
             if (admin) {
@@ -35,8 +44,8 @@ let AdminauthService = class AdminauthService {
                 });
             }
             const hash = bcrypt.hashSync(data.password, 10);
-            const newAdmin = await this.prisma.admin.create({
-                data: { ...data, password: hash },
+            const newAdmin = await this.prisma.user.create({
+                data: { ...data, password: hash, verified: 1 },
             });
             const token = this.jwt.sign({ id: newAdmin.id, role: data.role });
             return {
@@ -56,7 +65,7 @@ let AdminauthService = class AdminauthService {
     }
     async login(data) {
         try {
-            const admin = await this.prisma.admin.findUnique({
+            const admin = await this.prisma.user.findUnique({
                 where: { email: data.email },
             });
             if (!admin) {
@@ -90,6 +99,10 @@ let AdminauthService = class AdminauthService {
             console.log(error);
             throw new common_1.InternalServerErrorException({ message: 'Server error' });
         }
+    }
+    async findAll() {
+        const all = await this.prisma.admin.findMany();
+        return all;
     }
     async findMe(req) {
         try {
@@ -126,11 +139,110 @@ let AdminauthService = class AdminauthService {
             throw new common_1.InternalServerErrorException({ message: 'Server error' });
         }
     }
+    async withdrawReqView() {
+        try {
+            const all = await this.prisma.withdraw.findMany();
+            return {
+                data: [all],
+                messages: [],
+                statusCode: 200,
+                time: new Date(),
+            };
+        }
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            throw new common_1.InternalServerErrorException({ message: 'Server error' });
+        }
+    }
+    async withdrawReq(data) {
+        try {
+            const withdraw = await this.prisma.withdraw.findUnique({
+                where: { id: data.id },
+            });
+            if (!withdraw) {
+                throw new common_1.NotFoundException({
+                    data: [],
+                    messages: ['Withdraw request not found'],
+                    statusCode: 404,
+                    time: new Date(),
+                });
+            }
+            if (data.status === client_1.WithdrawStatus.ACCEPTED) {
+                const btcToUsdRate = await this.getBtcToUsdRate();
+                if (!btcToUsdRate || isNaN(btcToUsdRate)) {
+                    throw new common_1.InternalServerErrorException({
+                        message: 'Unable to fetch BTC rate',
+                    });
+                }
+                const btcAmount = parseFloat((withdraw.amount / btcToUsdRate).toFixed(8));
+                const updateBalance = withdraw.type === client_1.WithdrawType.TOPUP
+                    ? { increment: btcAmount }
+                    : { decrement: btcAmount };
+                await this.prisma.user.update({
+                    where: { id: withdraw.userId },
+                    data: {
+                        balance: updateBalance,
+                    },
+                });
+            }
+            await this.prisma.withdraw.update({
+                where: { id: data.id },
+                data,
+            });
+            return {
+                data: [],
+                messages: ['Withdraw request updated'],
+                statusCode: 200,
+                time: new Date(),
+            };
+        }
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.error(error);
+            throw new common_1.InternalServerErrorException({ message: 'Server error' });
+        }
+    }
+    async deleteHistory(id) {
+        try {
+            const withdraw = await this.prisma.withdraw.findUnique({
+                where: { id },
+            });
+            if (!withdraw) {
+                throw new common_1.NotFoundException({
+                    data: [],
+                    messages: ['Withdraw request not found'],
+                    statusCode: 404,
+                    time: new Date(),
+                });
+            }
+            await this.prisma.withdraw.delete({
+                where: { id },
+            });
+            return {
+                data: [],
+                messages: ['Withdraw request deleted'],
+                statusCode: 200,
+                time: new Date(),
+            };
+        }
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.error(error);
+            throw new common_1.InternalServerErrorException({ message: 'Server error' });
+        }
+    }
 };
 exports.AdminauthService = AdminauthService;
 exports.AdminauthService = AdminauthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        axios_1.HttpService])
 ], AdminauthService);
 //# sourceMappingURL=adminauth.service.js.map

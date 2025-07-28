@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
 const jwt_1 = require("@nestjs/jwt");
+const axios_1 = require("@nestjs/axios");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -21,6 +22,7 @@ exports.AuthModule = AuthModule = __decorate([
                 global: true,
                 secret: process.env.JWT_SECRET,
             }),
+            axios_1.HttpModule,
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService],

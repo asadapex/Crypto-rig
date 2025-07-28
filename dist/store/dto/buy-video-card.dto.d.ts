@@ -1,4 +1,4 @@
 export declare class BuyVideoCardDto {
-    type: string;
+    videoCardId: string;
     count: number;
 }

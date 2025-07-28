@@ -17,28 +17,55 @@ const common_1 = require("@nestjs/common");
 const store_service_1 = require("./store.service");
 const buy_video_card_dto_1 = require("./dto/buy-video-card.dto");
 const jwtauth_guard_1 = require("../jwtauth/jwtauth.guard");
-const swagger_1 = require("@nestjs/swagger");
+const role_guard_1 = require("../role/role.guard");
+const role_decorator_1 = require("../decorators/role-decorator");
+const client_1 = require("@prisma/client");
+const order_check_dto_1 = require("./dto/order-check.dto");
 let StoreController = class StoreController {
     storeService;
     constructor(storeService) {
         this.storeService = storeService;
     }
-    async buy(req, dtos) {
+    async buy(req, data) {
         const userId = req['user-id'];
-        return this.storeService.buyCards(userId, dtos);
+        return this.storeService.buyCards(userId, data);
+    }
+    async myOrders(req) {
+        const userId = req['user-id'];
+        return this.storeService.myOrders(userId);
+    }
+    async checkOrder(id, data) {
+        return this.storeService.checkOrder(id, data);
     }
 };
 exports.StoreController = StoreController;
 __decorate([
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
-    (0, common_1.Post)('buy'),
-    (0, swagger_1.ApiBody)({ type: [buy_video_card_dto_1.BuyVideoCardDto] }),
+    (0, common_1.Post)('order'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Array]),
+    __metadata("design:paramtypes", [Object, buy_video_card_dto_1.BuyVideoCardDto]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "buy", null);
+__decorate([
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
+    (0, common_1.Get)('order'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], StoreController.prototype, "myOrders", null);
+__decorate([
+    (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(role_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
+    (0, common_1.Patch)('admin/order:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, order_check_dto_1.OrderCheckDto]),
+    __metadata("design:returntype", Promise)
+], StoreController.prototype, "checkOrder", null);
 exports.StoreController = StoreController = __decorate([
     (0, common_1.Controller)('store'),
     __metadata("design:paramtypes", [store_service_1.StoreService])

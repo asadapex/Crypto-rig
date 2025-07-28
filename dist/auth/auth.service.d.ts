@@ -6,10 +6,13 @@ import { Request } from 'express';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import { CollectUserBalanceDto } from './dto/collect-balance.dto';
+import { HttpService } from '@nestjs/axios';
 export declare class AuthService {
     private readonly prisma;
     private readonly jwt;
-    constructor(prisma: PrismaService, jwt: JwtService);
+    private readonly httpService;
+    constructor(prisma: PrismaService, jwt: JwtService, httpService: HttpService);
+    getBtcToUsdRate(): Promise<number>;
     findUser(email: string): Promise<{
         email: string;
         password: string;
@@ -81,11 +84,14 @@ export declare class AuthService {
     withdrawBalance(req: Request, data: WithdrawDto): Promise<{
         data: {
             type: import(".prisma/client").$Enums.WithdrawType;
+            description: string | null;
             id: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            cardNumber: string;
             userId: string;
+            reciept: string;
         }[];
         messages: string[];
         statusCode: number;
@@ -94,11 +100,14 @@ export declare class AuthService {
     withdrawRequests(req: Request): Promise<{
         data: {
             type: import(".prisma/client").$Enums.WithdrawType;
+            description: string | null;
             id: string;
             status: import(".prisma/client").$Enums.WithdrawStatus;
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            cardNumber: string;
             userId: string;
+            reciept: string;
         }[];
         messages: string[];
         statusCode: number;
