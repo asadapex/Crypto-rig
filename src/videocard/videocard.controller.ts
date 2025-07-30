@@ -32,7 +32,7 @@ export class VideocardController {
   findAll() {
     return this.videocardService.findAll();
   }
-  @Get()
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.videocardService.findOne(id);
   }
