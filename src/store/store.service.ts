@@ -8,10 +8,20 @@ import { PrismaService } from '../prisma/prisma.service';
 import { BuyVideoCardDto } from './dto/buy-video-card.dto';
 import { OrderStatus } from '@prisma/client';
 import { OrderCheckDto } from './dto/order-check.dto';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class StoreService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly httpService: HttpService,
+  ) {}
+
+  async getBtcToUsdRate(): Promise<number> {
+    const url = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+    const response = await this.httpService.axiosRef.get(url);
+    return parseFloat(response.data.price);
+  }
 
   async buyCards(userId: string, data: BuyVideoCardDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -40,6 +50,24 @@ export class StoreService {
         data: [],
         messages: ['Video Card not found'],
         statusCode: 404,
+        time: new Date(),
+      });
+    }
+
+    const btcToUsdRate = await this.getBtcToUsdRate();
+    if (!btcToUsdRate || isNaN(btcToUsdRate)) {
+      throw new InternalServerErrorException({
+        message: 'Unable to fetch BTC rate',
+      });
+    }
+
+    const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
+
+    if (btcAmount > user.balance) {
+      throw new BadRequestException({
+        data: [],
+        messages: ['Not enough balance'],
+        statusCode: 400,
         time: new Date(),
       });
     }
@@ -82,6 +110,7 @@ export class StoreService {
 
     const all = await this.prisma.order.findMany({
       where: { userId },
+      include: { videoCard: true },
     });
 
     return {
@@ -130,6 +159,20 @@ export class StoreService {
             },
           });
         }
+
+        const btcToUsdRate = await this.getBtcToUsdRate();
+        if (!btcToUsdRate || isNaN(btcToUsdRate)) {
+          throw new InternalServerErrorException({
+            message: 'Unable to fetch BTC rate',
+          });
+        }
+
+        const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
+
+        await this.prisma.user.update({
+          where: { id: order.userId },
+          data: { balance: { decrement: btcAmount } },
+        });
 
         return {
           data: [],
