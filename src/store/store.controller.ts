@@ -39,8 +39,8 @@ export class StoreController {
   @Roles(UserRole.ADMIN)
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard)
-  @Patch('admin/order:id')
-  async checkOrder(@Param('id') id: string, data: OrderCheckDto) {
+  @Patch('admin/order/:id')
+  async checkOrder(@Param('id') id: string, @Body() data: OrderCheckDto) {
     return this.storeService.checkOrder(id, data);
   }
 }
