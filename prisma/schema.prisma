@@ -121,6 +121,7 @@ model Order {
   videoCard   VideoCard   @relation(fields: [videoCardId], references: [id])
   videoCardId String
   count       Int
+  read        Boolean @default(false)
   status      OrderStatus
   description String?
 }

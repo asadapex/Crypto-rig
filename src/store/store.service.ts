@@ -109,7 +109,12 @@ export class StoreService {
     }
 
     const all = await this.prisma.order.findMany({
-      where: { userId },
+      where: {
+        userId,
+        NOT: {
+          status: OrderStatus.ACCEPTED,
+        },
+      },
       include: { videoCard: true },
     });
 
