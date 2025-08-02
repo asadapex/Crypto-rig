@@ -9,6 +9,7 @@ import { BuyVideoCardDto } from './dto/buy-video-card.dto';
 import { OrderStatus } from '@prisma/client';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { HttpService } from '@nestjs/axios';
+import { OrderReadDto } from './dto/order-read.dto';
 
 @Injectable()
 export class StoreService {
@@ -87,6 +88,38 @@ export class StoreService {
       statusCode: 200,
       time: new Date(),
     };
+  }
+
+  async orderPatch(data: OrderReadDto, id: string) {
+    try {
+      const one = await this.prisma.order.findUnique({
+        where: { id },
+      });
+      if (!one) {
+        throw new NotFoundException({
+          data: [],
+          messages: ['Order not found'],
+          statusCode: 404,
+          time: new Date(),
+        });
+      }
+      await this.prisma.order.update({
+        where: { id },
+        data: { read: data.read },
+      });
+      return {
+        data: [],
+        messages: ['Order updated'],
+        statusCode: 200,
+        time: new Date(),
+      };
+    } catch (error) {
+      if (error != InternalServerErrorException) {
+        throw error;
+      }
+      console.log(error);
+      throw new InternalServerErrorException({ message: 'Server error' });
+    }
   }
 
   async myOrders(userId: string) {

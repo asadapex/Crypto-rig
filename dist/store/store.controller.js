@@ -21,6 +21,7 @@ const role_guard_1 = require("../role/role.guard");
 const role_decorator_1 = require("../decorators/role-decorator");
 const client_1 = require("@prisma/client");
 const order_check_dto_1 = require("./dto/order-check.dto");
+const order_read_dto_1 = require("./dto/order-read.dto");
 let StoreController = class StoreController {
     storeService;
     constructor(storeService) {
@@ -29,6 +30,9 @@ let StoreController = class StoreController {
     async buy(req, data) {
         const userId = req['user-id'];
         return this.storeService.buyCards(userId, data);
+    }
+    async orderPatch(data) {
+        return this.storeService.orderPatch(data);
     }
     async myOrders(req) {
         const userId = req['user-id'];
@@ -50,6 +54,14 @@ __decorate([
 ], StoreController.prototype, "buy", null);
 __decorate([
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
+    (0, common_1.Patch)('order'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [order_read_dto_1.OrderReadDto]),
+    __metadata("design:returntype", Promise)
+], StoreController.prototype, "orderPatch", null);
+__decorate([
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Get)('order'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -60,8 +72,9 @@ __decorate([
     (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
     (0, common_1.UseGuards)(role_guard_1.RolesGuard),
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
-    (0, common_1.Patch)('admin/order:id'),
+    (0, common_1.Patch)('admin/order/:id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, order_check_dto_1.OrderCheckDto]),
     __metadata("design:returntype", Promise)

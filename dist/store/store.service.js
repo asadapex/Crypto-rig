@@ -13,10 +13,18 @@ exports.StoreService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const client_1 = require("@prisma/client");
+const axios_1 = require("@nestjs/axios");
 let StoreService = class StoreService {
     prisma;
-    constructor(prisma) {
+    httpService;
+    constructor(prisma, httpService) {
         this.prisma = prisma;
+        this.httpService = httpService;
+    }
+    async getBtcToUsdRate() {
+        const url = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+        const response = await this.httpService.axiosRef.get(url);
+        return parseFloat(response.data.price);
     }
     async buyCards(userId, data) {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -46,6 +54,21 @@ let StoreService = class StoreService {
                 time: new Date(),
             });
         }
+        const btcToUsdRate = await this.getBtcToUsdRate();
+        if (!btcToUsdRate || isNaN(btcToUsdRate)) {
+            throw new common_1.InternalServerErrorException({
+                message: 'Unable to fetch BTC rate',
+            });
+        }
+        const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
+        if (btcAmount > user.balance) {
+            throw new common_1.BadRequestException({
+                data: [],
+                messages: ['Not enough balance'],
+                statusCode: 400,
+                time: new Date(),
+            });
+        }
         await this.prisma.order.create({
             data: {
                 userId,
@@ -60,6 +83,38 @@ let StoreService = class StoreService {
             statusCode: 200,
             time: new Date(),
         };
+    }
+    async orderPatch(data) {
+        try {
+            const one = await this.prisma.order.findUnique({
+                where: { id: data.id },
+            });
+            if (!one) {
+                throw new common_1.NotFoundException({
+                    data: [],
+                    messages: ['Order not found'],
+                    statusCode: 404,
+                    time: new Date(),
+                });
+            }
+            await this.prisma.order.update({
+                where: { id: data.id },
+                data: { read: data.read },
+            });
+            return {
+                data: [],
+                messages: ['Order updated'],
+                statusCode: 200,
+                time: new Date(),
+            };
+        }
+        catch (error) {
+            if (error != common_1.InternalServerErrorException) {
+                throw error;
+            }
+            console.log(error);
+            throw new common_1.InternalServerErrorException({ message: 'Server error' });
+        }
     }
     async myOrders(userId) {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -79,7 +134,13 @@ let StoreService = class StoreService {
             });
         }
         const all = await this.prisma.order.findMany({
-            where: { userId },
+            where: {
+                userId,
+                NOT: {
+                    status: client_1.OrderStatus.ACCEPTED,
+                },
+            },
+            include: { videoCard: true },
         });
         return {
             data: all,
@@ -123,6 +184,17 @@ let StoreService = class StoreService {
                         },
                     });
                 }
+                const btcToUsdRate = await this.getBtcToUsdRate();
+                if (!btcToUsdRate || isNaN(btcToUsdRate)) {
+                    throw new common_1.InternalServerErrorException({
+                        message: 'Unable to fetch BTC rate',
+                    });
+                }
+                const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
+                await this.prisma.user.update({
+                    where: { id: order.userId },
+                    data: { balance: { decrement: btcAmount } },
+                });
                 return {
                     data: [],
                     messages: ['Order accepted'],
@@ -161,6 +233,7 @@ let StoreService = class StoreService {
 exports.StoreService = StoreService;
 exports.StoreService = StoreService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        axios_1.HttpService])
 ], StoreService);
 //# sourceMappingURL=store.service.js.map

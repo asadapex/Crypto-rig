@@ -10,11 +10,13 @@ exports.StoreModule = void 0;
 const common_1 = require("@nestjs/common");
 const store_service_1 = require("./store.service");
 const store_controller_1 = require("./store.controller");
+const axios_1 = require("@nestjs/axios");
 let StoreModule = class StoreModule {
 };
 exports.StoreModule = StoreModule;
 exports.StoreModule = StoreModule = __decorate([
     (0, common_1.Module)({
+        imports: [axios_1.HttpModule],
         controllers: [store_controller_1.StoreController],
         providers: [store_service_1.StoreService],
     })

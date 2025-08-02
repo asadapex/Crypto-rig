@@ -2,6 +2,7 @@ import { StoreService } from './store.service';
 import { BuyVideoCardDto } from './dto/buy-video-card.dto';
 import { Request } from 'express';
 import { OrderCheckDto } from './dto/order-check.dto';
+import { OrderReadDto } from './dto/order-read.dto';
 export declare class StoreController {
     private readonly storeService;
     constructor(storeService: StoreService);
@@ -11,15 +12,42 @@ export declare class StoreController {
         statusCode: number;
         time: Date;
     }>;
+    orderPatch(data: OrderReadDto): Promise<{
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
     myOrders(req: Request): Promise<{
-        data: {
+        data: ({
+            videoCard: {
+                id: string;
+                createdAt: Date;
+                image: string | null;
+                manufacturer: string;
+                model: string;
+                release: number;
+                algorithm: string;
+                hashRate: string;
+                powerEfficiency: string;
+                powerUsage: string;
+                supportedCoins: string;
+                network: string;
+                fans: number;
+                temperature: string;
+                noiseLevel: string;
+                weight: string;
+                price: number;
+            };
+        } & {
+            description: string | null;
             id: string;
+            status: import(".prisma/client").$Enums.OrderStatus;
             userId: string;
             videoCardId: string;
             count: number;
-            status: import(".prisma/client").$Enums.OrderStatus;
-            description: string | null;
-        }[];
+            read: boolean;
+        })[];
         messages: never[];
         statusCode: number;
         time: Date;

@@ -17,6 +17,7 @@ import { RolesGuard } from 'src/role/role.guard';
 import { Roles } from 'src/decorators/role-decorator';
 import { UserRole } from '@prisma/client';
 import { OrderCheckDto } from './dto/order-check.dto';
+import { OrderReadDto } from './dto/order-read.dto';
 
 @Controller('store')
 export class StoreController {
@@ -27,6 +28,12 @@ export class StoreController {
   async buy(@Req() req: Request, @Body() data: BuyVideoCardDto) {
     const userId = req['user-id'];
     return this.storeService.buyCards(userId, data);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('order/:id')
+  async orderPatch(@Body() data: OrderReadDto, @Param('id') id: string) {
+    return this.storeService.orderPatch(data, id);
   }
 
   @UseGuards(AuthGuard)
