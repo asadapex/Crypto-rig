@@ -84,10 +84,10 @@ let StoreService = class StoreService {
             time: new Date(),
         };
     }
-    async orderPatch(data) {
+    async orderPatch(data, id) {
         try {
             const one = await this.prisma.order.findUnique({
-                where: { id: data.id },
+                where: { id },
             });
             if (!one) {
                 throw new common_1.NotFoundException({
@@ -98,7 +98,7 @@ let StoreService = class StoreService {
                 });
             }
             await this.prisma.order.update({
-                where: { id: data.id },
+                where: { id },
                 data: { read: data.read },
             });
             return {

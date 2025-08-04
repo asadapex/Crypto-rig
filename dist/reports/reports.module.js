@@ -5,20 +5,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OrderReadDto = void 0;
-const swagger_1 = require("@nestjs/swagger");
-const class_validator_1 = require("class-validator");
-class OrderReadDto {
-    read;
-}
-exports.OrderReadDto = OrderReadDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Boolean, example: true }),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], OrderReadDto.prototype, "read", void 0);
-//# sourceMappingURL=order-read.dto.js.map
+exports.ReportsModule = void 0;
+const common_1 = require("@nestjs/common");
+const reports_controller_1 = require("./reports.controller");
+let ReportsModule = class ReportsModule {
+};
+exports.ReportsModule = ReportsModule;
+exports.ReportsModule = ReportsModule = __decorate([
+    (0, common_1.Module)({
+        controllers: [reports_controller_1.ReportsController]
+    })
+], ReportsModule);
+//# sourceMappingURL=reports.module.js.map

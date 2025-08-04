@@ -14,7 +14,7 @@ export declare class StoreService {
         statusCode: number;
         time: Date;
     }>;
-    orderPatch(data: OrderReadDto): Promise<{
+    orderPatch(data: OrderReadDto, id: string): Promise<{
         data: never[];
         messages: string[];
         statusCode: number;

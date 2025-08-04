@@ -52,20 +52,21 @@ model Admin {
 }
 
 model User {
-  id            String          @id @default(uuid())
-  email         String          @unique
-  password      String
-  cards         UserVideoCard[]
-  name          String?
-  surname       String?
-  phoneNumber   String?
-  verified      Int             @default(0)
-  monthlyProfit Float           @default(0)
-  balance       Float           @default(0)
-  role          UserRole        @default(USER)
-  createdAt     DateTime        @default(now())
-  Withdraw      Withdraw[]
-  Order         Order[]
+  id             String           @id @default(uuid())
+  email          String           @unique
+  password       String
+  cards          UserVideoCard[]
+  name           String?
+  surname        String?
+  phoneNumber    String?
+  verified       Int              @default(0)
+  monthlyProfit  Float            @default(0)
+  balance        Float            @default(0)
+  role           UserRole         @default(USER)
+  createdAt      DateTime         @default(now())
+  Withdraw       Withdraw[]
+  Order          Order[]
+  MonthlyProdits MonthlyProfits[]
 }
 
 model Withdraw {
@@ -121,7 +122,17 @@ model Order {
   videoCard   VideoCard   @relation(fields: [videoCardId], references: [id])
   videoCardId String
   count       Int
-  read        Boolean @default(false)
+  read        Boolean     @default(false)
   status      OrderStatus
   description String?
+}
+
+model MonthlyProfits {
+  id     String   @id @default(uuid())
+  user   User     @relation(fields: [userId], references: [id])
+  date   DateTime
+  profit Float
+  userId String
+
+  @@unique([userId, date])
 }

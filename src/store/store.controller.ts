@@ -12,7 +12,6 @@ import { StoreService } from './store.service';
 import { BuyVideoCardDto } from './dto/buy-video-card.dto';
 import { AuthGuard } from 'src/jwtauth/jwtauth.guard';
 import { Request } from 'express';
-import { ApiBody } from '@nestjs/swagger';
 import { RolesGuard } from 'src/role/role.guard';
 import { Roles } from 'src/decorators/role-decorator';
 import { UserRole } from '@prisma/client';

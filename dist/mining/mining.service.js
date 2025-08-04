@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const schedule_1 = require("@nestjs/schedule");
 const prisma_service_1 = require("../prisma/prisma.service");
 const client_1 = require("@prisma/client");
+const date_fns_1 = require("date-fns");
 let MiningService = class MiningService {
     prisma;
     constructor(prisma) {
@@ -41,6 +42,29 @@ let MiningService = class MiningService {
         await this.prisma.$transaction(updates);
         console.log(`[MINING] ${userCards.length} ACTIVE cards updated`);
     }
+    async createMonthlyProfits() {
+        const users = await this.prisma.user.findMany();
+        const lastMonthStart = (0, date_fns_1.startOfMonth)((0, date_fns_1.subMonths)(new Date(), 1));
+        for (const user of users) {
+            await this.prisma.monthlyProfits.upsert({
+                where: {
+                    userId_date: {
+                        userId: user.id,
+                        date: lastMonthStart,
+                    },
+                },
+                update: {
+                    profit: user.monthlyProfit,
+                },
+                create: {
+                    userId: user.id,
+                    date: lastMonthStart,
+                    profit: user.monthlyProfit,
+                },
+            });
+            console.log(`✅ Profit saved for ${user.email}: $${user.monthlyProfit}`);
+        }
+    }
 };
 exports.MiningService = MiningService;
 __decorate([
@@ -55,6 +79,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], MiningService.prototype, "handleMining", null);
+__decorate([
+    (0, schedule_1.Cron)('5 0 1 * *'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], MiningService.prototype, "createMonthlyProfits", null);
 exports.MiningService = MiningService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])

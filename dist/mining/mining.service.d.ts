@@ -4,4 +4,5 @@ export declare class MiningService {
     constructor(prisma: PrismaService);
     resetMonthlyProfit(): Promise<void>;
     handleMining(): Promise<void>;
+    createMonthlyProfits(): Promise<void>;
 }

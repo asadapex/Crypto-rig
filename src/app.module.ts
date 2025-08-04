@@ -10,6 +10,7 @@ import { VideocardModule } from './videocard/videocard.module';
 import { UsersModule } from './users/users.module';
 import { MulterModule } from './multer/multer.module';
 import { AdminauthModule } from './adminauth/adminauth.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AdminauthModule } from './adminauth/adminauth.module';
     UsersModule,
     MulterModule,
     AdminauthModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

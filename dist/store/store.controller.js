@@ -31,8 +31,8 @@ let StoreController = class StoreController {
         const userId = req['user-id'];
         return this.storeService.buyCards(userId, data);
     }
-    async orderPatch(data) {
-        return this.storeService.orderPatch(data);
+    async orderPatch(data, id) {
+        return this.storeService.orderPatch(data, id);
     }
     async myOrders(req) {
         const userId = req['user-id'];
@@ -54,10 +54,11 @@ __decorate([
 ], StoreController.prototype, "buy", null);
 __decorate([
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
-    (0, common_1.Patch)('order'),
+    (0, common_1.Patch)('order/:id'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [order_read_dto_1.OrderReadDto]),
+    __metadata("design:paramtypes", [order_read_dto_1.OrderReadDto, String]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "orderPatch", null);
 __decorate([
