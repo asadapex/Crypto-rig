@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { MulterModule } from './multer/multer.module';
 import { AdminauthModule } from './adminauth/adminauth.module';
 import { ReportsModule } from './reports/reports.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ReportsModule } from './reports/reports.module';
     MulterModule,
     AdminauthModule,
     ReportsModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

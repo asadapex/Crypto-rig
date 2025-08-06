@@ -45,6 +45,7 @@ export declare class StoreService {
             description: string | null;
             id: string;
             status: import(".prisma/client").$Enums.OrderStatus;
+            createdAt: Date;
             userId: string;
             videoCardId: string;
             count: number;

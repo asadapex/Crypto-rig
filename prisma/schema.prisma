@@ -80,6 +80,7 @@ model Withdraw {
   type          WithdrawType   @default(WITHDRAW)
   status        WithdrawStatus @default(PENDING)
   description   String?
+  createdAt     DateTime       @default(now())
 }
 
 model UserVideoCard {
@@ -125,6 +126,7 @@ model Order {
   read        Boolean     @default(false)
   status      OrderStatus
   description String?
+  createdAt   DateTime    @default(now())
 }
 
 model MonthlyProfits {

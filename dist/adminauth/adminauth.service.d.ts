@@ -54,6 +54,7 @@ export declare class AdminauthService {
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
             cardNumber: string;
+            createdAt: Date;
             userId: string;
             reciept: string;
         }[][];

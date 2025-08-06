@@ -72,6 +72,7 @@ export declare class AuthController {
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
             cardNumber: string;
+            createdAt: Date;
             userId: string;
             reciept: string;
         }[];
@@ -88,6 +89,7 @@ export declare class AuthController {
             amount: number;
             paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
             cardNumber: string;
+            createdAt: Date;
             userId: string;
             reciept: string;
         }[];
