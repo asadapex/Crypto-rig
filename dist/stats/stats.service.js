@@ -34,12 +34,18 @@ let StatsService = class StatsService {
             return acc + order.count * (order.videoCard?.price || 0);
         }, 0);
         return {
-            totalRevenueUSD,
-            totalMiningProfitUSD: totalProfit._sum.earned ?? 0,
-            averagePurchaseValue: avgOrder._avg.count ?? 0,
-            newUsersToday,
-            activeDevices,
-            inactiveDevices,
+            data: [
+                {
+                    totalRevenueUSD,
+                    totalMiningProfitUSD: totalProfit._sum.earned ?? 0,
+                    averagePurchaseValue: avgOrder._avg.count ?? 0,
+                    newUsersToday,
+                    activeDevices,
+                    inactiveDevices,
+                },
+            ],
+            messages: [],
+            statusCode: 200,
         };
     }
     async getTopUsersByProfit(limit = 5) {
@@ -53,7 +59,7 @@ let StatsService = class StatsService {
         const users = await this.prisma.user.findMany({
             where: { id: { in: userIds } },
         });
-        return grouped.map((g) => {
+        const data = grouped.map((g) => {
             const user = users.find((u) => u.id === g.userId);
             return {
                 userId: g.userId,
@@ -61,6 +67,11 @@ let StatsService = class StatsService {
                 profitUSD: g._sum.profit ?? 0,
             };
         });
+        return {
+            data,
+            messages: [],
+            statusCode: 200,
+        };
     }
     async getProductStats() {
         const [orders, mostPopular, unsoldProducts] = await Promise.all([
@@ -86,13 +97,20 @@ let StatsService = class StatsService {
                 sold: item._sum.count ?? 0,
             };
         }));
+        const data = [
+            {
+                totalProductsSold: orders._sum.count ?? 0,
+                mostPopularProducts: topProducts,
+                unsoldProducts: unsoldProducts.map((p) => ({
+                    name: `${p.manufacturer} ${p.model}`,
+                    stock: p.price,
+                })),
+            },
+        ];
         return {
-            totalProductsSold: orders._sum.count ?? 0,
-            mostPopularProducts: topProducts,
-            unsoldProducts: unsoldProducts.map((p) => ({
-                name: `${p.manufacturer} ${p.model}`,
-                stock: p.price,
-            })),
+            data,
+            messages: [],
+            statusCode: 200,
         };
     }
     async getCharts(from, to) {
@@ -119,20 +137,29 @@ let StatsService = class StatsService {
         const dailyMiningProfit = {};
         for (const profit of profits) {
             const date = profit.date.toISOString().split('T')[0];
-            dailyMiningProfit[date] = (dailyMiningProfit[date] || 0) + profit.profit;
+            dailyMiningProfit[date] =
+                (dailyMiningProfit[date] || 0) + profit.profit;
         }
         const activeUsersOverTime = {};
         for (const user of activeUsers) {
             const date = user.createdAt.toISOString().split('T')[0];
-            activeUsersOverTime[date] = (activeUsersOverTime[date] || 0) + 1;
+            activeUsersOverTime[date] =
+                (activeUsersOverTime[date] || 0) + 1;
         }
+        const data = [
+            {
+                dailySales: Object.entries(dailySales).map(([date, revenueUSD]) => ({
+                    date,
+                    revenueUSD,
+                })),
+                dailyMiningProfit: Object.entries(dailyMiningProfit).map(([date, profitUSD]) => ({ date, profitUSD })),
+                activeUsersOverTime: Object.entries(activeUsersOverTime).map(([date, count]) => ({ date, count })),
+            },
+        ];
         return {
-            dailySales: Object.entries(dailySales).map(([date, revenueUSD]) => ({
-                date,
-                revenueUSD,
-            })),
-            dailyMiningProfit: Object.entries(dailyMiningProfit).map(([date, profitUSD]) => ({ date, profitUSD })),
-            activeUsersOverTime: Object.entries(activeUsersOverTime).map(([date, count]) => ({ date, count })),
+            data,
+            messages: [],
+            statusCode: 200,
         };
     }
 };

@@ -2,11 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { subDays, startOfDay } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+interface IAnyObject {
+  [key: string]: any;
+}
+
+export interface IServiceReponse {
+  data: IAnyObject[];
+  messages: IAnyObject[];
+  statusCode: number;
+}
+
 @Injectable()
 export class StatsService {
   constructor(private prisma: PrismaService) {}
 
-  async getSummary() {
+  async getSummary(): Promise<IServiceReponse> {
     const today = startOfDay(new Date());
 
     const [
@@ -32,16 +42,22 @@ export class StatsService {
     }, 0);
 
     return {
-      totalRevenueUSD,
-      totalMiningProfitUSD: totalProfit._sum.earned ?? 0,
-      averagePurchaseValue: avgOrder._avg.count ?? 0,
-      newUsersToday,
-      activeDevices,
-      inactiveDevices,
+      data: [
+        {
+          totalRevenueUSD,
+          totalMiningProfitUSD: totalProfit._sum.earned ?? 0,
+          averagePurchaseValue: avgOrder._avg.count ?? 0,
+          newUsersToday,
+          activeDevices,
+          inactiveDevices,
+        },
+      ],
+      messages: [],
+      statusCode: 200,
     };
   }
 
-  async getTopUsersByProfit(limit = 5) {
+  async getTopUsersByProfit(limit = 5): Promise<IServiceReponse> {
     const grouped = await this.prisma.monthlyProfits.groupBy({
       by: ['userId'],
       _sum: { profit: true },
@@ -54,7 +70,7 @@ export class StatsService {
       where: { id: { in: userIds } },
     });
 
-    return grouped.map((g) => {
+    const data = grouped.map((g) => {
       const user = users.find((u) => u.id === g.userId);
       return {
         userId: g.userId,
@@ -62,9 +78,15 @@ export class StatsService {
         profitUSD: g._sum.profit ?? 0,
       };
     });
+
+    return {
+      data,
+      messages: [],
+      statusCode: 200,
+    };
   }
 
-  async getProductStats() {
+  async getProductStats(): Promise<IServiceReponse> {
     const [orders, mostPopular, unsoldProducts] = await Promise.all([
       this.prisma.order.aggregate({ _sum: { count: true } }),
 
@@ -94,17 +116,25 @@ export class StatsService {
       }),
     );
 
+    const data = [
+      {
+        totalProductsSold: orders._sum.count ?? 0,
+        mostPopularProducts: topProducts,
+        unsoldProducts: unsoldProducts.map((p) => ({
+          name: `${p.manufacturer} ${p.model}`,
+          stock: p.price,
+        })),
+      },
+    ];
+
     return {
-      totalProductsSold: orders._sum.count ?? 0,
-      mostPopularProducts: topProducts,
-      unsoldProducts: unsoldProducts.map((p) => ({
-        name: `${p.manufacturer} ${p.model}`,
-        stock: p.price,
-      })),
+      data,
+      messages: [],
+      statusCode: 200,
     };
   }
 
-  async getCharts(from?: Date, to?: Date) {
+  async getCharts(from?: Date, to?: Date): Promise<IServiceReponse> {
     const start = from ?? subDays(new Date(), 30);
     const end = to ?? new Date();
 
@@ -131,26 +161,36 @@ export class StatsService {
     const dailyMiningProfit = {};
     for (const profit of profits) {
       const date = profit.date.toISOString().split('T')[0];
-      dailyMiningProfit[date] = (dailyMiningProfit[date] || 0) + profit.profit;
+      dailyMiningProfit[date] =
+        (dailyMiningProfit[date] || 0) + profit.profit;
     }
 
     const activeUsersOverTime = {};
     for (const user of activeUsers) {
       const date = user.createdAt.toISOString().split('T')[0];
-      activeUsersOverTime[date] = (activeUsersOverTime[date] || 0) + 1;
+      activeUsersOverTime[date] =
+        (activeUsersOverTime[date] || 0) + 1;
     }
 
+    const data = [
+      {
+        dailySales: Object.entries(dailySales).map(([date, revenueUSD]) => ({
+          date,
+          revenueUSD,
+        })),
+        dailyMiningProfit: Object.entries(dailyMiningProfit).map(
+          ([date, profitUSD]) => ({ date, profitUSD }),
+        ),
+        activeUsersOverTime: Object.entries(activeUsersOverTime).map(
+          ([date, count]) => ({ date, count }),
+        ),
+      },
+    ];
+
     return {
-      dailySales: Object.entries(dailySales).map(([date, revenueUSD]) => ({
-        date,
-        revenueUSD,
-      })),
-      dailyMiningProfit: Object.entries(dailyMiningProfit).map(
-        ([date, profitUSD]) => ({ date, profitUSD }),
-      ),
-      activeUsersOverTime: Object.entries(activeUsersOverTime).map(
-        ([date, count]) => ({ date, count }),
-      ),
+      data,
+      messages: [],
+      statusCode: 200,
     };
   }
 }

@@ -1,43 +1,18 @@
 import { PrismaService } from 'src/prisma/prisma.service';
+interface IAnyObject {
+    [key: string]: any;
+}
+export interface IServiceReponse {
+    data: IAnyObject[];
+    messages: IAnyObject[];
+    statusCode: number;
+}
 export declare class StatsService {
     private prisma;
     constructor(prisma: PrismaService);
-    getSummary(): Promise<{
-        totalRevenueUSD: number;
-        totalMiningProfitUSD: number;
-        averagePurchaseValue: number;
-        newUsersToday: number;
-        activeDevices: number;
-        inactiveDevices: number;
-    }>;
-    getTopUsersByProfit(limit?: number): Promise<{
-        userId: string;
-        name: string;
-        profitUSD: number;
-    }[]>;
-    getProductStats(): Promise<{
-        totalProductsSold: number;
-        mostPopularProducts: {
-            name: string;
-            sold: number;
-        }[];
-        unsoldProducts: {
-            name: string;
-            stock: number;
-        }[];
-    }>;
-    getCharts(from?: Date, to?: Date): Promise<{
-        dailySales: {
-            date: string;
-            revenueUSD: unknown;
-        }[];
-        dailyMiningProfit: {
-            date: string;
-            profitUSD: unknown;
-        }[];
-        activeUsersOverTime: {
-            date: string;
-            count: unknown;
-        }[];
-    }>;
+    getSummary(): Promise<IServiceReponse>;
+    getTopUsersByProfit(limit?: number): Promise<IServiceReponse>;
+    getProductStats(): Promise<IServiceReponse>;
+    getCharts(from?: Date, to?: Date): Promise<IServiceReponse>;
 }
+export {};
