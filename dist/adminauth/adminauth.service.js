@@ -101,12 +101,12 @@ let AdminauthService = class AdminauthService {
         }
     }
     async findAll() {
-        const all = await this.prisma.admin.findMany();
+        const all = await this.prisma.user.findMany();
         return all;
     }
     async findMe(req) {
         try {
-            const admin = await this.prisma.admin.findUnique({
+            const admin = await this.prisma.user.findUnique({
                 where: { id: req['user-id'] },
             });
             if (!admin) {

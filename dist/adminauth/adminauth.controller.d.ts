@@ -23,16 +23,22 @@ export declare class AdminauthController {
         time: Date;
     }>;
     findAll(): Promise<{
+        id: string;
         email: string;
         password: string;
-        name: string;
-        id: string;
+        name: string | null;
+        surname: string | null;
+        phoneNumber: string | null;
+        verified: number;
+        monthlyProfit: number;
+        balance: number;
         role: import(".prisma/client").$Enums.UserRole;
+        createdAt: Date;
     }[]>;
     findMe(req: Request): Promise<{
         data: {
             id: string;
-            name: string;
+            name: string | null;
             email: string;
             role: import(".prisma/client").$Enums.UserRole;
         }[];
@@ -42,16 +48,16 @@ export declare class AdminauthController {
     }>;
     withdrawReqView(): Promise<{
         data: {
-            type: import(".prisma/client").$Enums.WithdrawType;
-            description: string | null;
             id: string;
-            status: import(".prisma/client").$Enums.WithdrawStatus;
-            amount: number;
-            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
-            cardNumber: string;
             createdAt: Date;
             userId: string;
+            amount: number;
             reciept: string;
+            cardNumber: string;
+            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            type: import(".prisma/client").$Enums.WithdrawType;
+            status: import(".prisma/client").$Enums.WithdrawStatus;
+            description: string | null;
         }[][];
         messages: never[];
         statusCode: number;
