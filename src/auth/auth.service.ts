@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { VdcardStatusDto } from './dto/vdcard-status.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
-import { UserRole, WithdrawStatus, WithdrawType } from '@prisma/client';
+import { OrderStatus, UserRole, WithdrawStatus, WithdrawType } from '@prisma/client';
 import { CollectUserBalanceDto } from './dto/collect-balance.dto';
 import { HttpService } from '@nestjs/axios';
 
@@ -243,7 +243,7 @@ export class AuthService {
         },
       },
     });
-
+  
     if (!user)
       throw new NotFoundException({
         data: [],
@@ -251,7 +251,19 @@ export class AuthService {
         statusCode: 404,
         time: new Date(),
       });
-
+  
+    const orders = await this.prisma.order.findMany({
+      where: { userId: req['user-id'] },
+    });
+  
+    const pendingOrders = await this.prisma.order.findMany({
+      where: { userId: req['user-id'], status: OrderStatus.PENDING },
+      include: {
+        videoCard: true,
+      },
+    });
+    
+  
     const data = {
       name: user.name,
       surname: user.surname,
@@ -271,8 +283,15 @@ export class AuthService {
           status: card.status,
         };
       }),
+      pendingOrders: pendingOrders.map((order) => ({
+        id: order.id,
+        productId: order.videoCardId,
+        count: order.count,
+        createdAt: order.createdAt,
+        status: order.status,
+      })),
     };
-
+  
     return {
       data,
       messages: [],
@@ -280,6 +299,7 @@ export class AuthService {
       time: new Date(),
     };
   }
+  
 
   async withdrawBalance(req: Request, data: WithdrawDto) {
     try {

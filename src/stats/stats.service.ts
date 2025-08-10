@@ -2,21 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { subDays, startOfDay } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-interface IAnyObject {
-  [key: string]: any;
-}
-
-export interface IServiceReponse {
-  data: IAnyObject[];
-  messages: IAnyObject[];
-  statusCode: number;
-}
-
 @Injectable()
 export class StatsService {
   constructor(private prisma: PrismaService) {}
 
-  async getSummary(): Promise<IServiceReponse> {
+  async getSummary() {
     const today = startOfDay(new Date());
 
     const [
@@ -57,7 +47,7 @@ export class StatsService {
     };
   }
 
-  async getTopUsersByProfit(limit = 5): Promise<IServiceReponse> {
+  async getTopUsersByProfit(limit = 5) {
     const grouped = await this.prisma.monthlyProfits.groupBy({
       by: ['userId'],
       _sum: { profit: true },
@@ -97,7 +87,7 @@ export class StatsService {
   }
   
 
-  async getProductStats(): Promise<IServiceReponse> {
+  async getProductStats() {
     const [orders, mostPopular, unsoldProducts] = await Promise.all([
       this.prisma.order.aggregate({ _sum: { count: true } }),
   
@@ -146,7 +136,7 @@ export class StatsService {
   }
   
 
-  async getCharts(from?: Date, to?: Date): Promise<IServiceReponse> {
+  async getCharts(from?: Date, to?: Date) {
     const start = from ?? subDays(new Date(), 30);
     const end = to ?? new Date();
 
