@@ -22,6 +22,7 @@ const role_decorator_1 = require("../decorators/role-decorator");
 const client_1 = require("@prisma/client");
 const order_check_dto_1 = require("./dto/order-check.dto");
 const order_read_dto_1 = require("./dto/order-read.dto");
+const order_create_dto_1 = require("./dto/order-create-dto");
 let StoreController = class StoreController {
     storeService;
     constructor(storeService) {
@@ -37,6 +38,9 @@ let StoreController = class StoreController {
     async myOrders(req) {
         const userId = req['user-id'];
         return this.storeService.myOrders(userId);
+    }
+    async adminOrder(data) {
+        return this.storeService.buyCards(data.userId, data);
     }
     async checkOrder(id, data) {
         return this.storeService.checkOrder(id, data);
@@ -69,6 +73,16 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "myOrders", null);
+__decorate([
+    (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(role_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
+    (0, common_1.Post)('admin/order'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [order_create_dto_1.OrderCreateDto]),
+    __metadata("design:returntype", Promise)
+], StoreController.prototype, "adminOrder", null);
 __decorate([
     (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
     (0, common_1.UseGuards)(role_guard_1.RolesGuard),

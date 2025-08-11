@@ -3,6 +3,7 @@ import { BuyVideoCardDto } from './dto/buy-video-card.dto';
 import { Request } from 'express';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { OrderReadDto } from './dto/order-read.dto';
+import { OrderCreateDto } from './dto/order-create-dto';
 export declare class StoreController {
     private readonly storeService;
     constructor(storeService: StoreService);
@@ -50,6 +51,12 @@ export declare class StoreController {
             read: boolean;
         })[];
         messages: never[];
+        statusCode: number;
+        time: Date;
+    }>;
+    adminOrder(data: OrderCreateDto): Promise<{
+        data: never[];
+        messages: string[];
         statusCode: number;
         time: Date;
     }>;

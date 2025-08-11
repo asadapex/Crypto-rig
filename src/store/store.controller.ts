@@ -17,6 +17,7 @@ import { Roles } from 'src/decorators/role-decorator';
 import { UserRole } from '@prisma/client';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { OrderReadDto } from './dto/order-read.dto';
+import { OrderCreateDto } from './dto/order-create-dto';
 
 @Controller('store')
 export class StoreController {
@@ -40,6 +41,14 @@ export class StoreController {
   async myOrders(@Req() req: Request) {
     const userId = req['user-id'];
     return this.storeService.myOrders(userId);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard)
+  @Post('admin/order')
+  async adminOrder(@Body() data: OrderCreateDto) {
+    return this.storeService.buyCards(data.userId, data);
   }
 
   @Roles(UserRole.ADMIN)

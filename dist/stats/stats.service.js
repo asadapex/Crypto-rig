@@ -59,7 +59,7 @@ let StatsService = class StatsService {
         const users = await this.prisma.user.findMany({
             where: { id: { in: userIds } },
         });
-        const data = grouped.map((g) => {
+        const realData = grouped.map((g) => {
             const user = users.find((u) => u.id === g.userId);
             return {
                 userId: g.userId,
@@ -67,6 +67,14 @@ let StatsService = class StatsService {
                 profitUSD: g._sum.profit ?? 0,
             };
         });
+        const mockData = [
+            { userId: 'mock-1', name: 'Alice Johnson', profitUSD: 1250 },
+            { userId: 'mock-2', name: 'Bob Smith', profitUSD: 980 },
+            { userId: 'mock-3', name: 'Charlie Brown', profitUSD: 870 },
+            { userId: 'mock-4', name: 'Diana Prince', profitUSD: 760 },
+            { userId: 'mock-5', name: 'Ethan Hunt', profitUSD: 650 },
+        ];
+        const data = [...realData, ...mockData];
         return {
             data,
             messages: [],
@@ -103,7 +111,7 @@ let StatsService = class StatsService {
                 mostPopularProducts: topProducts,
                 unsoldProducts: unsoldProducts.map((p) => ({
                     name: `${p.manufacturer} ${p.model}`,
-                    stock: p.price,
+                    sold: 0,
                 })),
             },
         ];

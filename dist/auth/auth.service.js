@@ -235,6 +235,15 @@ let AuthService = class AuthService {
                 statusCode: 404,
                 time: new Date(),
             });
+        const orders = await this.prisma.order.findMany({
+            where: { userId: req['user-id'] },
+        });
+        const pendingOrders = await this.prisma.order.findMany({
+            where: { userId: req['user-id'], status: client_1.OrderStatus.PENDING },
+            include: {
+                videoCard: true,
+            },
+        });
         const data = {
             name: user.name,
             surname: user.surname,
@@ -254,6 +263,13 @@ let AuthService = class AuthService {
                     status: card.status,
                 };
             }),
+            pendingOrders: pendingOrders.map((order) => ({
+                id: order.id,
+                productId: order.videoCardId,
+                count: order.count,
+                createdAt: order.createdAt,
+                status: order.status,
+            })),
         };
         return {
             data,

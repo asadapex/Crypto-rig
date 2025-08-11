@@ -52,6 +52,13 @@ export declare class AuthController {
                 earned: number;
                 status: import(".prisma/client").$Enums.Status;
             }[];
+            pendingOrders: {
+                id: string;
+                productId: string;
+                count: number;
+                createdAt: Date;
+                status: import(".prisma/client").$Enums.OrderStatus;
+            }[];
         };
         messages: never[];
         statusCode: number;
