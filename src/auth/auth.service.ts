@@ -261,7 +261,7 @@ export class AuthService {
     });
   
     const pendingOrders = await this.prisma.order.findMany({
-      where: { userId: req['user-id'], status: OrderStatus.PENDING },
+      where: { userId: req['user-id'] },
       include: {
         items: { include: { videoCard: true } },
       },
