@@ -77,17 +77,23 @@ let StoreService = class StoreService {
                 time: new Date(),
             });
         }
-        const createdOrders = await Promise.all(dto.data.map(item => this.prisma.order.create({
+        const order = await this.prisma.order.create({
             data: {
                 userId,
+                status: client_1.OrderStatus.PENDING,
+                createdBy: userId,
+            },
+        });
+        const orderItems = await this.prisma.orderItems.createMany({
+            data: dto.data.map(item => ({
+                orderId: order.id,
                 videoCardId: item.videoCardId,
                 count: item.count,
-                status: client_1.OrderStatus.PENDING,
-            },
-        })));
+            })),
+        });
         return {
-            data: createdOrders,
-            messages: ['Orders created'],
+            data: { order, orderItems },
+            messages: ['Order created with items'],
             statusCode: 200,
             time: new Date(),
         };
@@ -148,7 +154,7 @@ let StoreService = class StoreService {
                     status: client_1.OrderStatus.ACCEPTED,
                 },
             },
-            include: { videoCard: true },
+            include: { items: true },
         });
         return {
             data: all,
@@ -159,7 +165,10 @@ let StoreService = class StoreService {
     }
     async checkOrder(id, data) {
         try {
-            const order = await this.prisma.order.findUnique({ where: { id } });
+            const order = await this.prisma.order.findUnique({
+                where: { id },
+                include: { items: true },
+            });
             if (!order) {
                 throw new common_1.NotFoundException({
                     data: [],
@@ -173,35 +182,39 @@ let StoreService = class StoreService {
                     where: { id },
                     data: { status: data.status },
                 });
-                const vdcard = await this.prisma.videoCard.findUnique({
-                    where: { id: order.videoCardId },
-                });
-                if (!vdcard) {
-                    throw new common_1.NotFoundException({
-                        data: [],
-                        messages: ['Video Card not found'],
-                        statusCode: 404,
-                        time: new Date(),
-                    });
-                }
-                for (let i = 0; i < order.count; i++) {
-                    await this.prisma.userVideoCard.create({
-                        data: {
-                            userId: order.userId,
-                            videoCardId: order.videoCardId,
-                        },
-                    });
-                }
                 const btcToUsdRate = await this.getBtcToUsdRate();
                 if (!btcToUsdRate || isNaN(btcToUsdRate)) {
                     throw new common_1.InternalServerErrorException({
                         message: 'Unable to fetch BTC rate',
                     });
                 }
-                const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
+                let totalBtc = 0;
+                for (const item of order.items) {
+                    const vdcard = await this.prisma.videoCard.findUnique({
+                        where: { id: item.videoCardId },
+                    });
+                    if (!vdcard) {
+                        throw new common_1.NotFoundException({
+                            data: [],
+                            messages: [`Video Card not found: ${item.videoCardId}`],
+                            statusCode: 404,
+                            time: new Date(),
+                        });
+                    }
+                    for (let i = 0; i < item.count; i++) {
+                        await this.prisma.userVideoCard.create({
+                            data: {
+                                userId: order.userId,
+                                videoCardId: item.videoCardId,
+                            },
+                        });
+                    }
+                    const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
+                    totalBtc += btcAmount * item.count;
+                }
                 await this.prisma.user.update({
                     where: { id: order.userId },
-                    data: { balance: { decrement: btcAmount } },
+                    data: { balance: { decrement: totalBtc } },
                 });
                 return {
                     data: [],

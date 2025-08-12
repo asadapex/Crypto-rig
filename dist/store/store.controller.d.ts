@@ -9,15 +9,17 @@ export declare class StoreController {
     constructor(storeService: StoreService);
     buy(req: Request, data: BuyVideoCardsDto): Promise<{
         data: {
-            id: string;
-            userId: string;
-            videoCardId: string;
-            count: number;
-            read: boolean;
-            status: import(".prisma/client").$Enums.OrderStatus;
-            description: string | null;
-            createdAt: Date;
-        }[];
+            order: {
+                description: string | null;
+                id: string;
+                status: import(".prisma/client").$Enums.OrderStatus;
+                createdAt: Date;
+                userId: string;
+                read: boolean;
+                createdBy: string;
+            };
+            orderItems: import(".prisma/client").Prisma.BatchPayload;
+        };
         messages: string[];
         statusCode: number;
         time: Date;
@@ -30,34 +32,20 @@ export declare class StoreController {
     }>;
     myOrders(req: Request): Promise<{
         data: ({
-            videoCard: {
+            items: {
                 id: string;
-                createdAt: Date;
-                image: string | null;
-                manufacturer: string;
-                model: string;
-                release: number;
-                algorithm: string;
-                hashRate: string;
-                powerEfficiency: string;
-                powerUsage: string;
-                supportedCoins: string;
-                network: string;
-                fans: number;
-                temperature: string;
-                noiseLevel: string;
-                weight: string;
-                price: number;
-            };
+                videoCardId: string;
+                count: number;
+                orderId: string;
+            }[];
         } & {
-            id: string;
-            userId: string;
-            videoCardId: string;
-            count: number;
-            read: boolean;
-            status: import(".prisma/client").$Enums.OrderStatus;
             description: string | null;
+            id: string;
+            status: import(".prisma/client").$Enums.OrderStatus;
             createdAt: Date;
+            userId: string;
+            read: boolean;
+            createdBy: string;
         })[];
         messages: never[];
         statusCode: number;
@@ -65,15 +53,17 @@ export declare class StoreController {
     }>;
     adminOrder(data: OrderCreateDto): Promise<{
         data: {
-            id: string;
-            userId: string;
-            videoCardId: string;
-            count: number;
-            read: boolean;
-            status: import(".prisma/client").$Enums.OrderStatus;
-            description: string | null;
-            createdAt: Date;
-        }[];
+            order: {
+                description: string | null;
+                id: string;
+                status: import(".prisma/client").$Enums.OrderStatus;
+                createdAt: Date;
+                userId: string;
+                read: boolean;
+                createdBy: string;
+            };
+            orderItems: import(".prisma/client").Prisma.BatchPayload;
+        };
         messages: string[];
         statusCode: number;
         time: Date;

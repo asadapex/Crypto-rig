@@ -42,15 +42,15 @@ export declare class StatsController {
         data: {
             dailySales: {
                 date: string;
-                revenueUSD: unknown;
+                revenueUSD: number;
             }[];
             dailyMiningProfit: {
                 date: string;
-                profitUSD: unknown;
+                profitUSD: number;
             }[];
             activeUsersOverTime: {
                 date: string;
-                count: unknown;
+                count: number;
             }[];
         }[];
         messages: never[];

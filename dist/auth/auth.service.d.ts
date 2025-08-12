@@ -14,12 +14,12 @@ export declare class AuthService {
     constructor(prisma: PrismaService, jwt: JwtService, httpService: HttpService);
     getBtcToUsdRate(): Promise<number>;
     findUser(email: string): Promise<{
+        id: string;
         email: string;
         password: string;
         name: string | null;
         surname: string | null;
         phoneNumber: string | null;
-        id: string;
         verified: number;
         monthlyProfit: number;
         balance: number;
@@ -77,8 +77,9 @@ export declare class AuthService {
                 status: import(".prisma/client").$Enums.Status;
             }[];
             pendingOrders: {
-                id: string;
+                orderId: string;
                 productId: string;
+                productName: string;
                 count: number;
                 createdAt: Date;
                 status: import(".prisma/client").$Enums.OrderStatus;
@@ -90,16 +91,16 @@ export declare class AuthService {
     }>;
     withdrawBalance(req: Request, data: WithdrawDto): Promise<{
         data: {
-            type: import(".prisma/client").$Enums.WithdrawType;
-            description: string | null;
             id: string;
-            status: import(".prisma/client").$Enums.WithdrawStatus;
-            amount: number;
-            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
-            cardNumber: string;
             createdAt: Date;
             userId: string;
+            status: import(".prisma/client").$Enums.WithdrawStatus;
+            description: string | null;
+            amount: number;
             reciept: string;
+            cardNumber: string;
+            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            type: import(".prisma/client").$Enums.WithdrawType;
         }[];
         messages: string[];
         statusCode: number;
@@ -107,16 +108,16 @@ export declare class AuthService {
     }>;
     withdrawRequests(req: Request): Promise<{
         data: {
-            type: import(".prisma/client").$Enums.WithdrawType;
-            description: string | null;
             id: string;
-            status: import(".prisma/client").$Enums.WithdrawStatus;
-            amount: number;
-            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
-            cardNumber: string;
             createdAt: Date;
             userId: string;
+            status: import(".prisma/client").$Enums.WithdrawStatus;
+            description: string | null;
+            amount: number;
             reciept: string;
+            cardNumber: string;
+            paymentMethod: import(".prisma/client").$Enums.PaymentMethod;
+            type: import(".prisma/client").$Enums.WithdrawType;
         }[];
         messages: string[];
         statusCode: number;
@@ -125,9 +126,9 @@ export declare class AuthService {
     updateStatus(userId: string, data: VdcardStatusDto): Promise<{
         data: {
             id: string;
-            status: import(".prisma/client").$Enums.Status;
             createdAt: Date;
             userId: string;
+            status: import(".prisma/client").$Enums.Status;
             earned: number;
             videoCardId: string;
         }[];

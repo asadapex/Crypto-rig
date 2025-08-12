@@ -10,15 +10,17 @@ export declare class StoreService {
     getBtcToUsdRate(): Promise<number>;
     buyCards(userId: string, dto: BuyVideoCardsDto): Promise<{
         data: {
-            description: string | null;
-            id: string;
-            status: import(".prisma/client").$Enums.OrderStatus;
-            createdAt: Date;
-            userId: string;
-            videoCardId: string;
-            count: number;
-            read: boolean;
-        }[];
+            order: {
+                description: string | null;
+                id: string;
+                status: import(".prisma/client").$Enums.OrderStatus;
+                createdAt: Date;
+                userId: string;
+                read: boolean;
+                createdBy: string;
+            };
+            orderItems: import(".prisma/client").Prisma.BatchPayload;
+        };
         messages: string[];
         statusCode: number;
         time: Date;
@@ -31,34 +33,20 @@ export declare class StoreService {
     }>;
     myOrders(userId: string): Promise<{
         data: ({
-            videoCard: {
+            items: {
                 id: string;
-                createdAt: Date;
-                image: string | null;
-                manufacturer: string;
-                model: string;
-                release: number;
-                algorithm: string;
-                hashRate: string;
-                powerEfficiency: string;
-                powerUsage: string;
-                supportedCoins: string;
-                network: string;
-                fans: number;
-                temperature: string;
-                noiseLevel: string;
-                weight: string;
-                price: number;
-            };
+                videoCardId: string;
+                count: number;
+                orderId: string;
+            }[];
         } & {
             description: string | null;
             id: string;
             status: import(".prisma/client").$Enums.OrderStatus;
             createdAt: Date;
             userId: string;
-            videoCardId: string;
-            count: number;
             read: boolean;
+            createdBy: string;
         })[];
         messages: never[];
         statusCode: number;

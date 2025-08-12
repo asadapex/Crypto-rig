@@ -244,25 +244,28 @@ export class AuthService {
       },
     });
   
-    if (!user)
+    if (!user) {
       throw new NotFoundException({
         data: [],
         messages: ['User not found'],
         statusCode: 404,
         time: new Date(),
       });
+    }
   
     const orders = await this.prisma.order.findMany({
       where: { userId: req['user-id'] },
+      include: {
+        items: { include: { videoCard: true } },
+      },
     });
   
     const pendingOrders = await this.prisma.order.findMany({
       where: { userId: req['user-id'], status: OrderStatus.PENDING },
       include: {
-        videoCard: true,
+        items: { include: { videoCard: true } },
       },
     });
-    
   
     const data = {
       name: user.name,
@@ -272,24 +275,25 @@ export class AuthService {
       verified: user.verified,
       balance: user.balance,
       monthlyProfit: user.monthlyProfit,
-      cards: user.cards.map((card) => {
-        return {
-          id: card.id,
-          image: card.videcard.image,
-          type: `${card.videcard.manufacturer} ${card.videcard.model}`,
-          createdAt: card.createdAt,
-          hashRate: card.videcard.hashRate,
-          earned: card.earned,
-          status: card.status,
-        };
-      }),
-      pendingOrders: pendingOrders.map((order) => ({
-        id: order.id,
-        productId: order.videoCardId,
-        count: order.count,
-        createdAt: order.createdAt,
-        status: order.status,
+      cards: user.cards.map((card) => ({
+        id: card.id,
+        image: card.videcard.image,
+        type: `${card.videcard.manufacturer} ${card.videcard.model}`,
+        createdAt: card.createdAt,
+        hashRate: card.videcard.hashRate,
+        earned: card.earned,
+        status: card.status,
       })),
+      pendingOrders: pendingOrders.flatMap((order) =>
+        order.items.map((item) => ({
+          orderId: order.id,
+          productId: item.videoCardId,
+          productName: `${item.videoCard.manufacturer} ${item.videoCard.model}`,
+          count: item.count,
+          createdAt: order.createdAt,
+          status: order.status,
+        }))
+      ),
     };
   
     return {
@@ -299,6 +303,7 @@ export class AuthService {
       time: new Date(),
     };
   }
+  
   
 
   async withdrawBalance(req: Request, data: WithdrawDto) {

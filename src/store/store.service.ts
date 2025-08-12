@@ -67,7 +67,6 @@ export class StoreService {
     }
   
     let totalBtcRequired = 0;
-  
     for (const item of dto.data) {
       const card = videoCards.find(vc => vc.id === item.videoCardId)!;
       const btcAmount = parseFloat((card.price / btcToUsdRate).toFixed(8));
@@ -83,22 +82,25 @@ export class StoreService {
       });
     }
   
-    const createdOrders = await Promise.all(
-      dto.data.map(item =>
-        this.prisma.order.create({
-          data: {
-            userId,
-            videoCardId: item.videoCardId,
-            count: item.count,
-            status: OrderStatus.PENDING,
-          },
-        }),
-      ),
-    );
+    const order = await this.prisma.order.create({
+      data: {
+        userId,
+        status: OrderStatus.PENDING,
+        createdBy: userId,
+      },
+    });
+  
+    const orderItems = await this.prisma.orderItems.createMany({
+      data: dto.data.map(item => ({
+        orderId: order.id,
+        videoCardId: item.videoCardId,
+        count: item.count,
+      })),
+    });
   
     return {
-      data: createdOrders,
-      messages: ['Orders created'],
+      data: { order, orderItems },
+      messages: ['Order created with items'],
       statusCode: 200,
       time: new Date(),
     };
@@ -162,7 +164,7 @@ export class StoreService {
           status: OrderStatus.ACCEPTED,
         },
       },
-      include: { videoCard: true },
+      include: { items: true },
     });
 
     return {
@@ -175,7 +177,11 @@ export class StoreService {
 
   async checkOrder(id: string, data: OrderCheckDto) {
     try {
-      const order = await this.prisma.order.findUnique({ where: { id } });
+      const order = await this.prisma.order.findUnique({
+        where: { id },
+        include: { items: true },
+      });
+  
       if (!order) {
         throw new NotFoundException({
           data: [],
@@ -184,48 +190,54 @@ export class StoreService {
           time: new Date(),
         });
       }
-
+  
       if (data.status === OrderStatus.ACCEPTED) {
         await this.prisma.order.update({
           where: { id },
           data: { status: data.status },
         });
-
-        const vdcard = await this.prisma.videoCard.findUnique({
-          where: { id: order.videoCardId },
-        });
-        if (!vdcard) {
-          throw new NotFoundException({
-            data: [],
-            messages: ['Video Card not found'],
-            statusCode: 404,
-            time: new Date(),
-          });
-        }
-
-        for (let i = 0; i < order.count; i++) {
-          await this.prisma.userVideoCard.create({
-            data: {
-              userId: order.userId,
-              videoCardId: order.videoCardId,
-            },
-          });
-        }
-
+  
         const btcToUsdRate = await this.getBtcToUsdRate();
         if (!btcToUsdRate || isNaN(btcToUsdRate)) {
           throw new InternalServerErrorException({
             message: 'Unable to fetch BTC rate',
           });
         }
-
-        const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
-
+  
+        let totalBtc = 0;
+  
+        for (const item of order.items) {
+          const vdcard = await this.prisma.videoCard.findUnique({
+            where: { id: item.videoCardId },
+          });
+  
+          if (!vdcard) {
+            throw new NotFoundException({
+              data: [],
+              messages: [`Video Card not found: ${item.videoCardId}`],
+              statusCode: 404,
+              time: new Date(),
+            });
+          }
+  
+          for (let i = 0; i < item.count; i++) {
+            await this.prisma.userVideoCard.create({
+              data: {
+                userId: order.userId,
+                videoCardId: item.videoCardId,
+              },
+            });
+          }
+  
+          const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
+          totalBtc += btcAmount * item.count;
+        }
+  
         await this.prisma.user.update({
           where: { id: order.userId },
-          data: { balance: { decrement: btcAmount } },
+          data: { balance: { decrement: totalBtc } },
         });
-
+  
         return {
           data: [],
           messages: ['Order accepted'],
@@ -233,7 +245,7 @@ export class StoreService {
           time: new Date(),
         };
       }
-
+  
       if (data.status === OrderStatus.REJECTED) {
         await this.prisma.order.update({
           where: { id },
@@ -246,7 +258,7 @@ export class StoreService {
           time: new Date(),
         };
       }
-
+  
       throw new BadRequestException({
         data: [],
         messages: ['Wrong status'],

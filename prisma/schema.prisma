@@ -113,20 +113,28 @@ model VideoCard {
   price           Int             @default(0)
   createdAt       DateTime        @default(now())
   UserVideoCard   UserVideoCard[]
-  Order           Order[]
+  OrderItems      OrderItems[]
 }
 
 model Order {
   id          String      @id @default(uuid())
   user        User        @relation(fields: [userId], references: [id])
   userId      String
-  videoCard   VideoCard   @relation(fields: [videoCardId], references: [id])
-  videoCardId String
-  count       Int
   read        Boolean     @default(false)
   status      OrderStatus
   description String?
   createdAt   DateTime    @default(now())
+  items       OrderItems[]
+  createdBy   String @default("system")
+}
+
+model OrderItems {
+  id          String      @id @default(uuid())
+  order       Order       @relation(fields: [orderId], references: [id])
+  orderId     String
+  videoCard   VideoCard   @relation(fields: [videoCardId], references: [id])
+  videoCardId String
+  count       Int
 }
 
 model MonthlyProfits {
