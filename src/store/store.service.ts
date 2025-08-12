@@ -138,28 +138,9 @@ export class StoreService {
     }
   }
 
-  async myOrders(userId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user)
-      throw new NotFoundException({
-        data: [],
-        messages: ['User not found'],
-        statusCode: 404,
-        time: new Date(),
-      });
-
-    if (user.verified === 0) {
-      throw new BadRequestException({
-        data: [],
-        messages: ['User has not verified'],
-        statusCode: 400,
-        time: new Date(),
-      });
-    }
-
+  async orders() {
     const all = await this.prisma.order.findMany({
       where: {
-        userId,
         NOT: {
           status: OrderStatus.ACCEPTED,
         },

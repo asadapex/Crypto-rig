@@ -37,11 +37,12 @@ export class StoreController {
     return this.storeService.orderPatch(data, id);
   }
 
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
   @UseGuards(AuthGuard)
   @Get('order')
-  async myOrders(@Req() req: Request) {
-    const userId = req['user-id'];
-    return this.storeService.myOrders(userId);
+  async orders() {
+    return this.storeService.orders();
   }
 
   @Roles(UserRole.ADMIN)
