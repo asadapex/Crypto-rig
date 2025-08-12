@@ -273,4 +273,15 @@ export class StoreService {
       throw new InternalServerErrorException({ message: 'Server error' });
     }
   }
+
+  async deleteAll() {
+    await this.prisma.orderItems.deleteMany({});
+    await this.prisma.order.deleteMany({});
+    return {
+      data: [],
+      messages: ['All orders deleted successfully'],
+      statusCode: 200,
+      time: new Date(),
+    };
+  }
 }

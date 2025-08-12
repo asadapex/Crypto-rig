@@ -7,6 +7,7 @@ import {
   Get,
   Patch,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { BuyVideoCardsDto } from './dto/buy-video-card.dto';
@@ -57,5 +58,14 @@ export class StoreController {
   @Patch('admin/order/:id')
   async checkOrder(@Param('id') id: string, @Body() data: OrderCheckDto) {
     return this.storeService.checkOrder(id, data);
+  }
+
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard)
+  @Delete('admin/order')
+  async deleteAll() {
+    return this.storeService.deleteAll();
   }
 }
