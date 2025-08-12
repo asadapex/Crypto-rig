@@ -11,12 +11,12 @@ export declare class StoreService {
     buyCards(userId: string, dto: BuyVideoCardsDto): Promise<{
         data: {
             order: {
-                description: string | null;
                 id: string;
-                status: import(".prisma/client").$Enums.OrderStatus;
-                createdAt: Date;
                 userId: string;
                 read: boolean;
+                status: import(".prisma/client").$Enums.OrderStatus;
+                description: string | null;
+                createdAt: Date;
                 createdBy: string;
             };
             orderItems: import(".prisma/client").Prisma.BatchPayload;
@@ -33,19 +33,43 @@ export declare class StoreService {
     }>;
     myOrders(userId: string): Promise<{
         data: ({
-            items: {
+            user: {
                 id: string;
+                email: string;
+            };
+            items: ({
+                videoCard: {
+                    id: string;
+                    createdAt: Date;
+                    image: string | null;
+                    manufacturer: string;
+                    model: string;
+                    release: number;
+                    algorithm: string;
+                    hashRate: string;
+                    powerEfficiency: string;
+                    powerUsage: string;
+                    supportedCoins: string;
+                    network: string;
+                    fans: number;
+                    temperature: string;
+                    noiseLevel: string;
+                    weight: string;
+                    price: number;
+                };
+            } & {
+                id: string;
+                orderId: string;
                 videoCardId: string;
                 count: number;
-                orderId: string;
-            }[];
+            })[];
         } & {
-            description: string | null;
             id: string;
-            status: import(".prisma/client").$Enums.OrderStatus;
-            createdAt: Date;
             userId: string;
             read: boolean;
+            status: import(".prisma/client").$Enums.OrderStatus;
+            description: string | null;
+            createdAt: Date;
             createdBy: string;
         })[];
         messages: never[];
@@ -53,6 +77,12 @@ export declare class StoreService {
         time: Date;
     }>;
     checkOrder(id: string, data: OrderCheckDto): Promise<{
+        data: never[];
+        messages: string[];
+        statusCode: number;
+        time: Date;
+    }>;
+    deleteAll(): Promise<{
         data: never[];
         messages: string[];
         statusCode: number;

@@ -154,7 +154,7 @@ let StoreService = class StoreService {
                     status: client_1.OrderStatus.ACCEPTED,
                 },
             },
-            include: { items: true },
+            include: { items: { include: { videoCard: true } }, user: { select: { id: true, email: true } } },
         });
         return {
             data: all,
@@ -167,7 +167,7 @@ let StoreService = class StoreService {
         try {
             const order = await this.prisma.order.findUnique({
                 where: { id },
-                include: { items: true },
+                include: { items: { include: { videoCard: true } }, user: { select: { id: true, email: true } } },
             });
             if (!order) {
                 throw new common_1.NotFoundException({
@@ -249,6 +249,16 @@ let StoreService = class StoreService {
             console.log(error);
             throw new common_1.InternalServerErrorException({ message: 'Server error' });
         }
+    }
+    async deleteAll() {
+        await this.prisma.orderItems.deleteMany({});
+        await this.prisma.order.deleteMany({});
+        return {
+            data: [],
+            messages: ['All orders deleted successfully'],
+            statusCode: 200,
+            time: new Date(),
+        };
     }
 };
 exports.StoreService = StoreService;

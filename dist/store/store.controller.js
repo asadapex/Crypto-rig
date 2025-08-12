@@ -45,6 +45,9 @@ let StoreController = class StoreController {
     async checkOrder(id, data) {
         return this.storeService.checkOrder(id, data);
     }
+    async deleteAll() {
+        return this.storeService.deleteAll();
+    }
 };
 exports.StoreController = StoreController;
 __decorate([
@@ -94,6 +97,15 @@ __decorate([
     __metadata("design:paramtypes", [String, order_check_dto_1.OrderCheckDto]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "checkOrder", null);
+__decorate([
+    (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(role_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
+    (0, common_1.Delete)('admin/order'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], StoreController.prototype, "deleteAll", null);
 exports.StoreController = StoreController = __decorate([
     (0, common_1.Controller)('store'),
     __metadata("design:paramtypes", [store_service_1.StoreService])
