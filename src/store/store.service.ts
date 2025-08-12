@@ -164,7 +164,7 @@ export class StoreService {
           status: OrderStatus.ACCEPTED,
         },
       },
-      include: { items: true, user: { select: { id: true, name: true } } },
+      include: { items: true, user: { select: { id: true, email: true } } },
     });
 
     return {
@@ -179,7 +179,7 @@ export class StoreService {
     try {
       const order = await this.prisma.order.findUnique({
         where: { id },
-        include: { items: true, user: { select: { id: true, name: true } } },
+        include: { items: true, user: { select: { id: true, email: true } } },
       });
   
       if (!order) {
