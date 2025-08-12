@@ -9,7 +9,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
-import { BuyVideoCardDto } from './dto/buy-video-card.dto';
+import { BuyVideoCardsDto } from './dto/buy-video-card.dto';
 import { AuthGuard } from 'src/jwtauth/jwtauth.guard';
 import { Request } from 'express';
 import { RolesGuard } from 'src/role/role.guard';
@@ -25,7 +25,7 @@ export class StoreController {
 
   @UseGuards(AuthGuard)
   @Post('order')
-  async buy(@Req() req: Request, @Body() data: BuyVideoCardDto) {
+  async buy(@Req() req: Request, @Body() data: BuyVideoCardsDto) {
     const userId = req['user-id'];
     return this.storeService.buyCards(userId, data);
   }

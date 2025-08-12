@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { BuyVideoCardDto } from './dto/buy-video-card.dto';
+import { BuyVideoCardsDto } from './dto/buy-video-card.dto';
 import { OrderStatus } from '@prisma/client';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { HttpService } from '@nestjs/axios';
@@ -24,7 +24,7 @@ export class StoreService {
     return parseFloat(response.data.price);
   }
 
-  async buyCards(userId: string, data: BuyVideoCardDto) {
+  async buyCards(userId: string, dto: BuyVideoCardsDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user)
       throw new NotFoundException({
@@ -33,7 +33,7 @@ export class StoreService {
         statusCode: 404,
         time: new Date(),
       });
-
+  
     if (user.verified === 0) {
       throw new BadRequestException({
         data: [],
@@ -42,29 +42,39 @@ export class StoreService {
         time: new Date(),
       });
     }
-
-    const vdcard = await this.prisma.videoCard.findUnique({
-      where: { id: data.videoCardId },
+  
+    const videoCardIds = dto.data.map(item => item.videoCardId);
+    const videoCards = await this.prisma.videoCard.findMany({
+      where: { id: { in: videoCardIds } },
     });
-    if (!vdcard) {
+  
+    if (videoCards.length !== videoCardIds.length) {
+      const foundIds = videoCards.map(vc => vc.id);
+      const notFoundIds = videoCardIds.filter(id => !foundIds.includes(id));
       throw new NotFoundException({
         data: [],
-        messages: ['Video Card not found'],
+        messages: [`Video Cards not found: ${notFoundIds.join(', ')}`],
         statusCode: 404,
         time: new Date(),
       });
     }
-
+  
     const btcToUsdRate = await this.getBtcToUsdRate();
     if (!btcToUsdRate || isNaN(btcToUsdRate)) {
       throw new InternalServerErrorException({
         message: 'Unable to fetch BTC rate',
       });
     }
-
-    const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
-
-    if (btcAmount > user.balance) {
+  
+    let totalBtcRequired = 0;
+  
+    for (const item of dto.data) {
+      const card = videoCards.find(vc => vc.id === item.videoCardId)!;
+      const btcAmount = parseFloat((card.price / btcToUsdRate).toFixed(8));
+      totalBtcRequired += btcAmount * item.count;
+    }
+  
+    if (totalBtcRequired > user.balance) {
       throw new BadRequestException({
         data: [],
         messages: ['Not enough balance'],
@@ -72,19 +82,23 @@ export class StoreService {
         time: new Date(),
       });
     }
-
-    await this.prisma.order.create({
-      data: {
-        userId,
-        videoCardId: data.videoCardId,
-        count: data.count,
-        status: OrderStatus.PENDING,
-      },
-    });
-
+  
+    const createdOrders = await Promise.all(
+      dto.data.map(item =>
+        this.prisma.order.create({
+          data: {
+            userId,
+            videoCardId: item.videoCardId,
+            count: item.count,
+            status: OrderStatus.PENDING,
+          },
+        }),
+      ),
+    );
+  
     return {
-      data: [],
-      messages: ['Order created'],
+      data: createdOrders,
+      messages: ['Orders created'],
       statusCode: 200,
       time: new Date(),
     };

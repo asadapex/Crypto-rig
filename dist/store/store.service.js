@@ -26,7 +26,7 @@ let StoreService = class StoreService {
         const response = await this.httpService.axiosRef.get(url);
         return parseFloat(response.data.price);
     }
-    async buyCards(userId, data) {
+    async buyCards(userId, dto) {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
         if (!user)
             throw new common_1.NotFoundException({
@@ -43,13 +43,16 @@ let StoreService = class StoreService {
                 time: new Date(),
             });
         }
-        const vdcard = await this.prisma.videoCard.findUnique({
-            where: { id: data.videoCardId },
+        const videoCardIds = dto.data.map(item => item.videoCardId);
+        const videoCards = await this.prisma.videoCard.findMany({
+            where: { id: { in: videoCardIds } },
         });
-        if (!vdcard) {
+        if (videoCards.length !== videoCardIds.length) {
+            const foundIds = videoCards.map(vc => vc.id);
+            const notFoundIds = videoCardIds.filter(id => !foundIds.includes(id));
             throw new common_1.NotFoundException({
                 data: [],
-                messages: ['Video Card not found'],
+                messages: [`Video Cards not found: ${notFoundIds.join(', ')}`],
                 statusCode: 404,
                 time: new Date(),
             });
@@ -60,8 +63,13 @@ let StoreService = class StoreService {
                 message: 'Unable to fetch BTC rate',
             });
         }
-        const btcAmount = parseFloat((vdcard.price / btcToUsdRate).toFixed(8));
-        if (btcAmount > user.balance) {
+        let totalBtcRequired = 0;
+        for (const item of dto.data) {
+            const card = videoCards.find(vc => vc.id === item.videoCardId);
+            const btcAmount = parseFloat((card.price / btcToUsdRate).toFixed(8));
+            totalBtcRequired += btcAmount * item.count;
+        }
+        if (totalBtcRequired > user.balance) {
             throw new common_1.BadRequestException({
                 data: [],
                 messages: ['Not enough balance'],
@@ -69,17 +77,17 @@ let StoreService = class StoreService {
                 time: new Date(),
             });
         }
-        await this.prisma.order.create({
+        const createdOrders = await Promise.all(dto.data.map(item => this.prisma.order.create({
             data: {
                 userId,
-                videoCardId: data.videoCardId,
-                count: data.count,
+                videoCardId: item.videoCardId,
+                count: item.count,
                 status: client_1.OrderStatus.PENDING,
             },
-        });
+        })));
         return {
-            data: [],
-            messages: ['Order created'],
+            data: createdOrders,
+            messages: ['Orders created'],
             statusCode: 200,
             time: new Date(),
         };

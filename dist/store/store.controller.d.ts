@@ -1,5 +1,5 @@
 import { StoreService } from './store.service';
-import { BuyVideoCardDto } from './dto/buy-video-card.dto';
+import { BuyVideoCardsDto } from './dto/buy-video-card.dto';
 import { Request } from 'express';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { OrderReadDto } from './dto/order-read.dto';
@@ -7,8 +7,17 @@ import { OrderCreateDto } from './dto/order-create-dto';
 export declare class StoreController {
     private readonly storeService;
     constructor(storeService: StoreService);
-    buy(req: Request, data: BuyVideoCardDto): Promise<{
-        data: never[];
+    buy(req: Request, data: BuyVideoCardsDto): Promise<{
+        data: {
+            id: string;
+            userId: string;
+            videoCardId: string;
+            count: number;
+            read: boolean;
+            status: import(".prisma/client").$Enums.OrderStatus;
+            description: string | null;
+            createdAt: Date;
+        }[];
         messages: string[];
         statusCode: number;
         time: Date;
@@ -41,21 +50,30 @@ export declare class StoreController {
                 price: number;
             };
         } & {
-            description: string | null;
             id: string;
-            status: import(".prisma/client").$Enums.OrderStatus;
-            createdAt: Date;
             userId: string;
             videoCardId: string;
             count: number;
             read: boolean;
+            status: import(".prisma/client").$Enums.OrderStatus;
+            description: string | null;
+            createdAt: Date;
         })[];
         messages: never[];
         statusCode: number;
         time: Date;
     }>;
     adminOrder(data: OrderCreateDto): Promise<{
-        data: never[];
+        data: {
+            id: string;
+            userId: string;
+            videoCardId: string;
+            count: number;
+            read: boolean;
+            status: import(".prisma/client").$Enums.OrderStatus;
+            description: string | null;
+            createdAt: Date;
+        }[];
         messages: string[];
         statusCode: number;
         time: Date;

@@ -1,5 +1,5 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { BuyVideoCardDto } from './dto/buy-video-card.dto';
+import { BuyVideoCardsDto } from './dto/buy-video-card.dto';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { HttpService } from '@nestjs/axios';
 import { OrderReadDto } from './dto/order-read.dto';
@@ -8,8 +8,17 @@ export declare class StoreService {
     private readonly httpService;
     constructor(prisma: PrismaService, httpService: HttpService);
     getBtcToUsdRate(): Promise<number>;
-    buyCards(userId: string, data: BuyVideoCardDto): Promise<{
-        data: never[];
+    buyCards(userId: string, dto: BuyVideoCardsDto): Promise<{
+        data: {
+            description: string | null;
+            id: string;
+            status: import(".prisma/client").$Enums.OrderStatus;
+            createdAt: Date;
+            userId: string;
+            videoCardId: string;
+            count: number;
+            read: boolean;
+        }[];
         messages: string[];
         statusCode: number;
         time: Date;

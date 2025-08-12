@@ -9,23 +9,38 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BuyVideoCardDto = void 0;
+exports.BuyVideoCardsDto = exports.BuySingleVideoCardDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class BuyVideoCardDto {
+const class_transformer_1 = require("class-transformer");
+class BuySingleVideoCardDto {
     videoCardId;
     count;
 }
-exports.BuyVideoCardDto = BuyVideoCardDto;
+exports.BuySingleVideoCardDto = BuySingleVideoCardDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ type: String, example: 'uuid' }),
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
-], BuyVideoCardDto.prototype, "videoCardId", void 0);
+], BuySingleVideoCardDto.prototype, "videoCardId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: Number, example: 1 }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
-], BuyVideoCardDto.prototype, "count", void 0);
+], BuySingleVideoCardDto.prototype, "count", void 0);
+class BuyVideoCardsDto {
+    data;
+}
+exports.BuyVideoCardsDto = BuyVideoCardsDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [BuySingleVideoCardDto], example: [
+            { videoCardId: 'uuid1', count: 1 },
+            { videoCardId: 'uuid2', count: 2 }
+        ] }),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => BuySingleVideoCardDto),
+    (0, class_validator_1.ArrayMinSize)(1),
+    __metadata("design:type", Array)
+], BuyVideoCardsDto.prototype, "data", void 0);
 //# sourceMappingURL=buy-video-card.dto.js.map

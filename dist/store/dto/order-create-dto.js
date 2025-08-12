@@ -13,7 +13,7 @@ exports.OrderCreateDto = void 0;
 const class_validator_1 = require("class-validator");
 const buy_video_card_dto_1 = require("./buy-video-card.dto");
 const swagger_1 = require("@nestjs/swagger");
-class OrderCreateDto extends buy_video_card_dto_1.BuyVideoCardDto {
+class OrderCreateDto extends buy_video_card_dto_1.BuyVideoCardsDto {
     userId;
 }
 exports.OrderCreateDto = OrderCreateDto;
