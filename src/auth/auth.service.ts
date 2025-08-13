@@ -260,6 +260,16 @@ export class AuthService {
       },
     });
   
+    const notifications = await this.prisma.notification.findMany({
+      where: {
+        OR: [
+          { userId: null },
+          { userId: req['user-id'] }
+        ]
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  
     const data = {
       name: user.name,
       surname: user.surname,
@@ -289,6 +299,7 @@ export class AuthService {
           read: order.read
         }))
       ),
+      notifications,
     };
   
     return {
@@ -298,7 +309,6 @@ export class AuthService {
       time: new Date(),
     };
   }
-  
   
 
   async withdrawBalance(req: Request, data: WithdrawDto) {

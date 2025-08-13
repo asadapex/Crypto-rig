@@ -12,6 +12,7 @@ import { MulterModule } from './multer/multer.module';
 import { AdminauthModule } from './adminauth/adminauth.module';
 import { ReportsModule } from './reports/reports.module';
 import { StatsModule } from './stats/stats.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { StatsModule } from './stats/stats.module';
     AdminauthModule,
     ReportsModule,
     StatsModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

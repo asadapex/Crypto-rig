@@ -97,7 +97,6 @@ export class StoreService {
           userId,
           status: OrderStatus.PENDING,
           createdBy: userId,
-          orderType,
         },
       });
     }
