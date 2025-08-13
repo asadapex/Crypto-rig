@@ -253,13 +253,6 @@ export class AuthService {
       });
     }
   
-    const orders = await this.prisma.order.findMany({
-      where: { userId: req['user-id'] },
-      include: {
-        items: { include: { videoCard: true } },
-      },
-    });
-  
     const pendingOrders = await this.prisma.order.findMany({
       where: { userId: req['user-id'] },
       include: {
