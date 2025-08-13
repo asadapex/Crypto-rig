@@ -286,6 +286,7 @@ export class AuthService {
           createdAt: order.createdAt,
           status: order.status,
           description: order.description,
+          read: order.read
         }))
       ),
     };
