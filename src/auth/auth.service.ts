@@ -285,6 +285,7 @@ export class AuthService {
           count: item.count,
           createdAt: order.createdAt,
           status: order.status,
+          description: order.description,
         }))
       ),
     };
