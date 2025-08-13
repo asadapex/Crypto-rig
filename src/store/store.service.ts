@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BuyVideoCardsDto } from './dto/buy-video-card.dto';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, OrderType } from '@prisma/client';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { HttpService } from '@nestjs/axios';
 import { OrderReadDto } from './dto/order-read.dto';
@@ -24,7 +24,7 @@ export class StoreService {
     return parseFloat(response.data.price);
   }
 
-  async buyCards(userId: string, dto: BuyVideoCardsDto) {
+  async buyCards(userId: string, dto: BuyVideoCardsDto, orderType?: OrderType) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user)
       throw new NotFoundException({
@@ -81,14 +81,26 @@ export class StoreService {
         time: new Date(),
       });
     }
-  
-    const order = await this.prisma.order.create({
-      data: {
-        userId,
-        status: OrderStatus.PENDING,
-        createdBy: userId,
-      },
-    });
+    let order;
+    if (orderType === OrderType.ADMIN) {
+      order = await this.prisma.order.create({
+        data: {
+          userId,
+          status: OrderStatus.PENDING,
+          createdBy: userId,
+          orderType,
+        },
+      });
+    } else {
+        order = await this.prisma.order.create({
+        data: {
+          userId,
+          status: OrderStatus.PENDING,
+          createdBy: userId,
+          orderType,
+        },
+      });
+    }
   
     const orderItems = await this.prisma.orderItems.createMany({
       data: dto.data.map(item => ({

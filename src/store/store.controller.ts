@@ -15,7 +15,7 @@ import { AuthGuard } from 'src/jwtauth/jwtauth.guard';
 import { Request } from 'express';
 import { RolesGuard } from 'src/role/role.guard';
 import { Roles } from 'src/decorators/role-decorator';
-import { UserRole } from '@prisma/client';
+import { OrderType, UserRole } from '@prisma/client';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { OrderReadDto } from './dto/order-read.dto';
 import { OrderCreateDto } from './dto/order-create-dto';
@@ -50,7 +50,7 @@ export class StoreController {
   @UseGuards(AuthGuard)
   @Post('admin/order')
   async adminOrder(@Body() data: OrderCreateDto) {
-    return this.storeService.buyCards(data.userId, data);
+    return this.storeService.buyCards(data.userId, data, OrderType.ADMIN);
   }
 
   @Roles(UserRole.ADMIN)
