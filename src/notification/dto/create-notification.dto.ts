@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional, IsString, IsUUID } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class CreateNotificationDto {
     @ApiProperty({ example: "Notification title" })
@@ -9,7 +9,6 @@ export class CreateNotificationDto {
     @IsString()
     description: string;
     @ApiProperty({ example: "Notification user id", required: false })
-    @IsUUID()
     @IsOptional()
     userId?: string;
 }
