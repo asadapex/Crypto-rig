@@ -11,6 +11,7 @@ export class NotificationService {
       data: {
         title: dto.title,
         description: dto.description,
+        type: dto.type,
         userId: dto.userId || null,
       },
     });
