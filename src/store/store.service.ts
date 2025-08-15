@@ -24,7 +24,7 @@ export class StoreService {
     return parseFloat(response.data.price);
   }
 
-  async buyCards(userId: string, dto: BuyVideoCardsDto, orderType?: OrderType) {
+  async buyCards(userId: string, dto: BuyVideoCardsDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user)
       throw new NotFoundException({
@@ -82,7 +82,7 @@ export class StoreService {
       });
     }
     let order;
-    if (orderType === OrderType.ADMIN) {
+    if (dto.orderType === OrderType.ADMIN) {
       order = await this.prisma.order.create({
         data: {
           userId,

@@ -50,7 +50,7 @@ export class StoreController {
   @UseGuards(AuthGuard)
   @Post('admin/order')
   async adminOrder(@Body() data: OrderCreateDto) {
-    return this.storeService.buyCards(data.userId, data, OrderType.ADMIN);
+    return this.storeService.buyCards(data.userId, data);
   }
 
   @Roles(UserRole.ADMIN)
