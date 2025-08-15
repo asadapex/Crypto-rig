@@ -297,6 +297,7 @@ export class AuthService {
         items: order.items.map((item) => ({
           productId: item.videoCardId,
           productName: `${item.videoCard.manufacturer} ${item.videoCard.model}`,
+          price: item.videoCard.price,
           count: item.count,
         })),
       })),
