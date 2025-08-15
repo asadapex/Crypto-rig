@@ -81,27 +81,14 @@ export class StoreService {
         time: new Date(),
       });
     }
-    let order;
-    if (dto.orderType === OrderType.ADMIN) {
-      order = await this.prisma.order.create({
+    const order = await this.prisma.order.create({
         data: {
           userId,
           status: OrderStatus.PENDING,
           createdBy: userId,
-          orderType: OrderType.ADMIN,
+          orderType: dto.orderType,
         },
       });
-    } else {
-        order = await this.prisma.order.create({
-        data: {
-          userId,
-          status: OrderStatus.PENDING,
-          createdBy: userId,
-          orderType: OrderType.USER,
-        },
-      });
-    }
-  
     const orderItems = await this.prisma.orderItems.createMany({
       data: dto.data.map(item => ({
         orderId: order.id,

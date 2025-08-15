@@ -26,5 +26,5 @@ export class BuyVideoCardsDto {
   data: BuySingleVideoCardDto[];
   @ApiProperty({ enum: OrderType, example: OrderType.USER })
   @IsEnum(OrderType)
-  orderType?: OrderType;
+  orderType: OrderType;
 }
