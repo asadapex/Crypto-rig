@@ -168,4 +168,5 @@ model Notification {
   createdAt   DateTime         @default(now())
   userId      String?
   type        NotificationType @default(INFO)
+  read        Boolean          @default(false)
 }
