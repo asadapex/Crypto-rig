@@ -88,7 +88,7 @@ export class StoreService {
           userId,
           status: OrderStatus.PENDING,
           createdBy: userId,
-          orderType,
+          orderType: OrderType.ADMIN,
         },
       });
     } else {
@@ -97,6 +97,7 @@ export class StoreService {
           userId,
           status: OrderStatus.PENDING,
           createdBy: userId,
+          orderType: OrderType.USER,
         },
       });
     }
