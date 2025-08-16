@@ -10,6 +10,7 @@ import { OrderStatus, OrderType } from '@prisma/client';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { HttpService } from '@nestjs/axios';
 import { OrderReadDto } from './dto/order-read.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class StoreService {
@@ -24,7 +25,7 @@ export class StoreService {
     return parseFloat(response.data.price);
   }
 
-  async buyCards(userId: string, dto: BuyVideoCardsDto) {
+  async buyCards(userId: string, dto: BuyVideoCardsDto, req: Request) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user)
       throw new NotFoundException({
@@ -81,11 +82,14 @@ export class StoreService {
         time: new Date(),
       });
     }
+
+    const creator = await this.prisma.user.findUnique({where: {id: req['user-id']}})
+
     const order = await this.prisma.order.create({
         data: {
           userId,
           status: OrderStatus.PENDING,
-          createdBy: userId,
+          createdBy: creator?.email,
           orderType: dto.orderType,
         },
       });

@@ -27,8 +27,7 @@ export class StoreController {
   @UseGuards(AuthGuard)
   @Post('order')
   async buy(@Req() req: Request, @Body() data: BuyVideoCardsDto) {
-    const userId = req['user-id'];
-    return this.storeService.buyCards(userId, data);
+    return this.storeService.buyCards(req['user-id'], data, req);
   }
 
   @UseGuards(AuthGuard)
@@ -49,8 +48,8 @@ export class StoreController {
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard)
   @Post('admin/order')
-  async adminOrder(@Body() data: OrderCreateDto) {
-    return this.storeService.buyCards(data.userId, data);
+  async adminOrder(@Body() data: OrderCreateDto, @Req() req: Request) {
+    return this.storeService.buyCards(data.userId, data, req);
   }
 
   @Roles(UserRole.ADMIN)
