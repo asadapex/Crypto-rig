@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { OrderStatus } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
 
 export class OrderCheckDto {
   @ApiProperty({ enum: OrderStatus, example: OrderStatus.ACCEPTED })
@@ -15,4 +15,8 @@ export class OrderCheckDto {
   @IsString()
   @IsNotEmpty()
   description?: string;
+
+  @ApiProperty({ type: Boolean, example: true })
+  @IsBoolean()
+  read: boolean;
 }

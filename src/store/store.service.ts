@@ -109,38 +109,6 @@ export class StoreService {
     };
   }
 
-  async orderPatch(data: OrderReadDto, id: string) {
-    try {
-      const one = await this.prisma.order.findUnique({
-        where: { id },
-      });
-      if (!one) {
-        throw new NotFoundException({
-          data: [],
-          messages: ['Order not found'],
-          statusCode: 404,
-          time: new Date(),
-        });
-      }
-      await this.prisma.order.update({
-        where: { id },
-        data: { read: data.read },
-      });
-      return {
-        data: [],
-        messages: ['Order updated'],
-        statusCode: 200,
-        time: new Date(),
-      };
-    } catch (error) {
-      if (error != InternalServerErrorException) {
-        throw error;
-      }
-      console.log(error);
-      throw new InternalServerErrorException({ message: 'Server error' });
-    }
-  }
-
   async orders() {
     const all = await this.prisma.order.findMany({
       include: { items: { include: { videoCard: true } }, user: { select: { id: true, email: true, role: true }}},
@@ -173,7 +141,7 @@ export class StoreService {
       if (data.status === OrderStatus.ACCEPTED) {
         await this.prisma.order.update({
           where: { id },
-          data: { status: OrderStatus.ACCEPTED },
+          data: { status: OrderStatus.ACCEPTED, read: data.read },
         });
   
         const btcToUsdRate = await this.getBtcToUsdRate();
@@ -228,7 +196,7 @@ export class StoreService {
       if (data.status === OrderStatus.REJECTED) {
         await this.prisma.order.update({
           where: { id },
-          data: { status: OrderStatus.REJECTED, description: data.description },
+          data: { status: OrderStatus.REJECTED, description: data.description, read: data.read },
         });
         return {
           data: [],
