@@ -143,11 +143,6 @@ export class StoreService {
 
   async orders() {
     const all = await this.prisma.order.findMany({
-      where: {
-        NOT: {
-          status: OrderStatus.ACCEPTED,
-        },
-      },
       include: { items: { include: { videoCard: true } }, user: { select: { id: true, email: true, role: true }}},
     });
 
@@ -178,7 +173,7 @@ export class StoreService {
       if (data.status === OrderStatus.ACCEPTED) {
         await this.prisma.order.update({
           where: { id },
-          data: { status: data.status },
+          data: { status: OrderStatus.ACCEPTED },
         });
   
         const btcToUsdRate = await this.getBtcToUsdRate();
@@ -233,7 +228,7 @@ export class StoreService {
       if (data.status === OrderStatus.REJECTED) {
         await this.prisma.order.update({
           where: { id },
-          data: { status: data.status, description: data.description },
+          data: { status: OrderStatus.REJECTED, description: data.description },
         });
         return {
           data: [],
