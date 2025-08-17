@@ -45,8 +45,7 @@ export class StoreController {
     return this.storeService.buyCards(data.userId, data, req);
   }
 
-  @Roles(UserRole.ADMIN)
-  @UseGuards(RolesGuard)
+
   @UseGuards(AuthGuard)
   @Patch('admin/order/:id')
   async checkOrder(@Param('id') id: string, @Body() data: OrderCheckDto) {
