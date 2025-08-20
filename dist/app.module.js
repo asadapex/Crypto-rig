@@ -21,6 +21,7 @@ const multer_module_1 = require("./multer/multer.module");
 const adminauth_module_1 = require("./adminauth/adminauth.module");
 const reports_module_1 = require("./reports/reports.module");
 const stats_module_1 = require("./stats/stats.module");
+const notification_module_1 = require("./notification/notification.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,6 +39,7 @@ exports.AppModule = AppModule = __decorate([
             adminauth_module_1.AdminauthModule,
             reports_module_1.ReportsModule,
             stats_module_1.StatsModule,
+            notification_module_1.NotificationModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

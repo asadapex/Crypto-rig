@@ -2,7 +2,6 @@ import { StoreService } from './store.service';
 import { BuyVideoCardsDto } from './dto/buy-video-card.dto';
 import { Request } from 'express';
 import { OrderCheckDto } from './dto/order-check.dto';
-import { OrderReadDto } from './dto/order-read.dto';
 import { OrderCreateDto } from './dto/order-create-dto';
 export declare class StoreController {
     private readonly storeService;
@@ -10,12 +9,13 @@ export declare class StoreController {
     buy(req: Request, data: BuyVideoCardsDto): Promise<{
         data: {
             order: {
+                description: string | null;
                 id: string;
+                status: import(".prisma/client").$Enums.OrderStatus;
+                createdAt: Date;
                 userId: string;
                 read: boolean;
-                status: import(".prisma/client").$Enums.OrderStatus;
-                description: string | null;
-                createdAt: Date;
+                orderType: import(".prisma/client").$Enums.OrderType | null;
                 createdBy: string;
             };
             orderItems: import(".prisma/client").Prisma.BatchPayload;
@@ -24,18 +24,8 @@ export declare class StoreController {
         statusCode: number;
         time: Date;
     }>;
-    orderPatch(data: OrderReadDto, id: string): Promise<{
-        data: never[];
-        messages: string[];
-        statusCode: number;
-        time: Date;
-    }>;
-    myOrders(req: Request): Promise<{
+    orders(): Promise<{
         data: ({
-            user: {
-                id: string;
-                email: string;
-            };
             items: ({
                 videoCard: {
                     id: string;
@@ -58,32 +48,39 @@ export declare class StoreController {
                 };
             } & {
                 id: string;
-                orderId: string;
                 videoCardId: string;
+                orderId: string;
                 count: number;
             })[];
+            user: {
+                email: string;
+                id: string;
+                role: import(".prisma/client").$Enums.UserRole;
+            };
         } & {
+            description: string | null;
             id: string;
+            status: import(".prisma/client").$Enums.OrderStatus;
+            createdAt: Date;
             userId: string;
             read: boolean;
-            status: import(".prisma/client").$Enums.OrderStatus;
-            description: string | null;
-            createdAt: Date;
+            orderType: import(".prisma/client").$Enums.OrderType | null;
             createdBy: string;
         })[];
         messages: never[];
         statusCode: number;
         time: Date;
     }>;
-    adminOrder(data: OrderCreateDto): Promise<{
+    adminOrder(data: OrderCreateDto, req: Request): Promise<{
         data: {
             order: {
+                description: string | null;
                 id: string;
+                status: import(".prisma/client").$Enums.OrderStatus;
+                createdAt: Date;
                 userId: string;
                 read: boolean;
-                status: import(".prisma/client").$Enums.OrderStatus;
-                description: string | null;
-                createdAt: Date;
+                orderType: import(".prisma/client").$Enums.OrderType | null;
                 createdBy: string;
             };
             orderItems: import(".prisma/client").Prisma.BatchPayload;

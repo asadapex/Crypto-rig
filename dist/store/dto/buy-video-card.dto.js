@@ -13,6 +13,8 @@ exports.BuyVideoCardsDto = exports.BuySingleVideoCardDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+const client_1 = require("@prisma/client");
+const class_validator_2 = require("class-validator");
 class BuySingleVideoCardDto {
     videoCardId;
     count;
@@ -31,6 +33,7 @@ __decorate([
 ], BuySingleVideoCardDto.prototype, "count", void 0);
 class BuyVideoCardsDto {
     data;
+    orderType;
 }
 exports.BuyVideoCardsDto = BuyVideoCardsDto;
 __decorate([
@@ -43,4 +46,9 @@ __decorate([
     (0, class_validator_1.ArrayMinSize)(1),
     __metadata("design:type", Array)
 ], BuyVideoCardsDto.prototype, "data", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ enum: client_1.OrderType, example: client_1.OrderType.USER }),
+    (0, class_validator_2.IsEnum)(client_1.OrderType),
+    __metadata("design:type", String)
+], BuyVideoCardsDto.prototype, "orderType", void 0);
 //# sourceMappingURL=buy-video-card.dto.js.map

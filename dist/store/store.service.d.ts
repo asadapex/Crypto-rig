@@ -2,21 +2,22 @@ import { PrismaService } from '../prisma/prisma.service';
 import { BuyVideoCardsDto } from './dto/buy-video-card.dto';
 import { OrderCheckDto } from './dto/order-check.dto';
 import { HttpService } from '@nestjs/axios';
-import { OrderReadDto } from './dto/order-read.dto';
+import { Request } from 'express';
 export declare class StoreService {
     private readonly prisma;
     private readonly httpService;
     constructor(prisma: PrismaService, httpService: HttpService);
     getBtcToUsdRate(): Promise<number>;
-    buyCards(userId: string, dto: BuyVideoCardsDto): Promise<{
+    buyCards(userId: string, dto: BuyVideoCardsDto, req: Request): Promise<{
         data: {
             order: {
+                description: string | null;
                 id: string;
+                status: import(".prisma/client").$Enums.OrderStatus;
+                createdAt: Date;
                 userId: string;
                 read: boolean;
-                status: import(".prisma/client").$Enums.OrderStatus;
-                description: string | null;
-                createdAt: Date;
+                orderType: import(".prisma/client").$Enums.OrderType | null;
                 createdBy: string;
             };
             orderItems: import(".prisma/client").Prisma.BatchPayload;
@@ -25,18 +26,8 @@ export declare class StoreService {
         statusCode: number;
         time: Date;
     }>;
-    orderPatch(data: OrderReadDto, id: string): Promise<{
-        data: never[];
-        messages: string[];
-        statusCode: number;
-        time: Date;
-    }>;
-    myOrders(userId: string): Promise<{
+    orders(): Promise<{
         data: ({
-            user: {
-                id: string;
-                email: string;
-            };
             items: ({
                 videoCard: {
                     id: string;
@@ -59,17 +50,23 @@ export declare class StoreService {
                 };
             } & {
                 id: string;
-                orderId: string;
                 videoCardId: string;
+                orderId: string;
                 count: number;
             })[];
+            user: {
+                email: string;
+                id: string;
+                role: import(".prisma/client").$Enums.UserRole;
+            };
         } & {
+            description: string | null;
             id: string;
+            status: import(".prisma/client").$Enums.OrderStatus;
+            createdAt: Date;
             userId: string;
             read: boolean;
-            status: import(".prisma/client").$Enums.OrderStatus;
-            description: string | null;
-            createdAt: Date;
+            orderType: import(".prisma/client").$Enums.OrderType | null;
             createdBy: string;
         })[];
         messages: never[];

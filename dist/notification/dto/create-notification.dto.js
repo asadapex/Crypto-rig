@@ -9,34 +9,41 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OrderCheckDto = void 0;
+exports.CreateNotificationDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
-class OrderCheckDto {
-    status;
+class CreateNotificationDto {
+    title;
     description;
+    userId;
+    type;
     read;
 }
-exports.OrderCheckDto = OrderCheckDto;
+exports.CreateNotificationDto = CreateNotificationDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ enum: client_1.OrderStatus, example: client_1.OrderStatus.ACCEPTED }),
-    (0, class_validator_1.IsEnum)(client_1.OrderStatus),
-    __metadata("design:type", String)
-], OrderCheckDto.prototype, "status", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({
-        type: String,
-        example: 'Your request was rejected due to policy violation.',
-    }),
-    (0, class_validator_1.ValidateIf)((o) => o.status === client_1.OrderStatus.REJECTED),
+    (0, swagger_1.ApiProperty)({ example: "Notification title" }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], OrderCheckDto.prototype, "description", void 0);
+], CreateNotificationDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Boolean, example: true }),
+    (0, swagger_1.ApiProperty)({ example: "Notification description" }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateNotificationDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: "Notification user id", required: false }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateNotificationDto.prototype, "userId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: client_1.NotificationType.INFO }),
+    (0, class_validator_1.IsEnum)(client_1.NotificationType),
+    __metadata("design:type", String)
+], CreateNotificationDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
-], OrderCheckDto.prototype, "read", void 0);
-//# sourceMappingURL=order-check.dto.js.map
+], CreateNotificationDto.prototype, "read", void 0);
+//# sourceMappingURL=create-notification.dto.js.map

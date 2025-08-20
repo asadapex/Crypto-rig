@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsController = void 0;
 const common_1 = require("@nestjs/common");
 const stats_service_1 = require("./stats.service");
+const calculate_investment_dto_1 = require("./calculate-investment.dto");
 let StatsController = class StatsController {
     statsService;
     constructor(statsService) {
@@ -33,6 +34,9 @@ let StatsController = class StatsController {
         const fromDate = from ? new Date(from) : undefined;
         const toDate = to ? new Date(to) : undefined;
         return this.statsService.getCharts(fromDate, toDate);
+    }
+    async calculate(dto) {
+        return this.statsService.calculateInvestment(dto);
     }
 };
 exports.StatsController = StatsController;
@@ -62,6 +66,13 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], StatsController.prototype, "getCharts", null);
+__decorate([
+    (0, common_1.Post)('calculate'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [calculate_investment_dto_1.CalculateInvestmentDto]),
+    __metadata("design:returntype", Promise)
+], StatsController.prototype, "calculate", null);
 exports.StatsController = StatsController = __decorate([
     (0, common_1.Controller)('admin/analytics'),
     __metadata("design:paramtypes", [stats_service_1.StatsService])

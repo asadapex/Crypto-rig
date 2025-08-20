@@ -1,4 +1,5 @@
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CalculateInvestmentDto } from './calculate-investment.dto';
 export declare class StatsService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -53,6 +54,16 @@ export declare class StatsService {
                 count: number;
             }[];
         }[];
+        messages: never[];
+        statusCode: number;
+    }>;
+    calculateInvestment(dto: CalculateInvestmentDto): Promise<{
+        data: {
+            videoCard: string;
+            units: number;
+            dailyIncome: number;
+            monthlyIncome: number;
+        };
         messages: never[];
         statusCode: number;
     }>;

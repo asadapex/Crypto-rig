@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { StatsService } from './stats.service';
+import { CalculateInvestmentDto } from './calculate-investment.dto';
 
 @Controller('admin/analytics')
 export class StatsController {
@@ -25,5 +26,10 @@ export class StatsController {
     const fromDate = from ? new Date(from) : undefined;
     const toDate = to ? new Date(to) : undefined;
     return this.statsService.getCharts(fromDate, toDate);
+  }
+
+  @Post('calculate')
+  async calculate(@Body() dto: CalculateInvestmentDto) {
+    return this.statsService.calculateInvestment(dto);
   }
 }

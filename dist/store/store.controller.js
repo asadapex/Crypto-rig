@@ -21,7 +21,6 @@ const role_guard_1 = require("../role/role.guard");
 const role_decorator_1 = require("../decorators/role-decorator");
 const client_1 = require("@prisma/client");
 const order_check_dto_1 = require("./dto/order-check.dto");
-const order_read_dto_1 = require("./dto/order-read.dto");
 const order_create_dto_1 = require("./dto/order-create-dto");
 let StoreController = class StoreController {
     storeService;
@@ -29,18 +28,13 @@ let StoreController = class StoreController {
         this.storeService = storeService;
     }
     async buy(req, data) {
-        const userId = req['user-id'];
-        return this.storeService.buyCards(userId, data);
+        return this.storeService.buyCards(req['user-id'], data, req);
     }
-    async orderPatch(data, id) {
-        return this.storeService.orderPatch(data, id);
+    async orders() {
+        return this.storeService.orders();
     }
-    async myOrders(req) {
-        const userId = req['user-id'];
-        return this.storeService.myOrders(userId);
-    }
-    async adminOrder(data) {
-        return this.storeService.buyCards(data.userId, data);
+    async adminOrder(data, req) {
+        return this.storeService.buyCards(data.userId, data, req);
     }
     async checkOrder(id, data) {
         return this.storeService.checkOrder(id, data);
@@ -60,35 +54,26 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "buy", null);
 __decorate([
-    (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
-    (0, common_1.Patch)('order/:id'),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [order_read_dto_1.OrderReadDto, String]),
-    __metadata("design:returntype", Promise)
-], StoreController.prototype, "orderPatch", null);
-__decorate([
+    (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    (0, common_1.UseGuards)(role_guard_1.RolesGuard),
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Get)('order'),
-    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], StoreController.prototype, "myOrders", null);
+], StoreController.prototype, "orders", null);
 __decorate([
     (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
     (0, common_1.UseGuards)(role_guard_1.RolesGuard),
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Post)('admin/order'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [order_create_dto_1.OrderCreateDto]),
+    __metadata("design:paramtypes", [order_create_dto_1.OrderCreateDto, Object]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "adminOrder", null);
 __decorate([
-    (0, role_decorator_1.Roles)(client_1.UserRole.ADMIN),
-    (0, common_1.UseGuards)(role_guard_1.RolesGuard),
     (0, common_1.UseGuards)(jwtauth_guard_1.AuthGuard),
     (0, common_1.Patch)('admin/order/:id'),
     __param(0, (0, common_1.Param)('id')),

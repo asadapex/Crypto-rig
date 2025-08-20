@@ -218,14 +218,11 @@ let AuthService = class AuthService {
         }
     }
     async findMe(req) {
+        const userId = req['user-id'];
         const user = await this.prisma.user.findUnique({
-            where: { id: req['user-id'] },
+            where: { id: userId },
             include: {
-                cards: {
-                    include: {
-                        videcard: true,
-                    },
-                },
+                cards: { include: { videcard: true } },
             },
         });
         if (!user) {
@@ -236,18 +233,24 @@ let AuthService = class AuthService {
                 time: new Date(),
             });
         }
-        const orders = await this.prisma.order.findMany({
-            where: { userId: req['user-id'] },
-            include: {
-                items: { include: { videoCard: true } },
-            },
-        });
-        const pendingOrders = await this.prisma.order.findMany({
-            where: { userId: req['user-id'], status: client_1.OrderStatus.PENDING },
-            include: {
-                items: { include: { videoCard: true } },
-            },
-        });
+        const [pendingOrders, notifications] = await Promise.all([
+            this.prisma.order.findMany({
+                where: { userId },
+                include: {
+                    items: { include: { videoCard: true } },
+                },
+                orderBy: { createdAt: 'desc' },
+            }),
+            this.prisma.notification.findMany({
+                where: {
+                    OR: [
+                        { userId: null },
+                        { userId },
+                    ],
+                },
+                orderBy: { createdAt: 'desc' },
+            }),
+        ]);
         const data = {
             name: user.name,
             surname: user.surname,
@@ -265,14 +268,21 @@ let AuthService = class AuthService {
                 earned: card.earned,
                 status: card.status,
             })),
-            pendingOrders: pendingOrders.flatMap((order) => order.items.map((item) => ({
+            pendingOrders: pendingOrders.map((order) => ({
                 orderId: order.id,
-                productId: item.videoCardId,
-                productName: `${item.videoCard.manufacturer} ${item.videoCard.model}`,
-                count: item.count,
-                createdAt: order.createdAt,
                 status: order.status,
-            }))),
+                createdAt: order.createdAt,
+                description: order.description,
+                read: order.read,
+                type: order.orderType,
+                items: order.items.map((item) => ({
+                    productId: item.videoCardId,
+                    productName: `${item.videoCard.manufacturer} ${item.videoCard.model}`,
+                    price: item.videoCard.price,
+                    count: item.count,
+                })),
+            })),
+            notifications,
         };
         return {
             data,

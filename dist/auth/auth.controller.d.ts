@@ -54,11 +54,26 @@ export declare class AuthController {
             }[];
             pendingOrders: {
                 orderId: string;
-                productId: string;
-                productName: string;
-                count: number;
-                createdAt: Date;
                 status: import(".prisma/client").$Enums.OrderStatus;
+                createdAt: Date;
+                description: string | null;
+                read: boolean;
+                type: import(".prisma/client").$Enums.OrderType | null;
+                items: {
+                    productId: string;
+                    productName: string;
+                    price: number;
+                    count: number;
+                }[];
+            }[];
+            notifications: {
+                type: import(".prisma/client").$Enums.NotificationType;
+                description: string;
+                title: string;
+                id: string;
+                createdAt: Date;
+                userId: string | null;
+                read: boolean;
             }[];
         };
         messages: never[];

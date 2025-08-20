@@ -1,4 +1,5 @@
 import { StatsService } from './stats.service';
+import { CalculateInvestmentDto } from './calculate-investment.dto';
 export declare class StatsController {
     private readonly statsService;
     constructor(statsService: StatsService);
@@ -53,6 +54,16 @@ export declare class StatsController {
                 count: number;
             }[];
         }[];
+        messages: never[];
+        statusCode: number;
+    }>;
+    calculate(dto: CalculateInvestmentDto): Promise<{
+        data: {
+            videoCard: string;
+            units: number;
+            dailyIncome: number;
+            monthlyIncome: number;
+        };
         messages: never[];
         statusCode: number;
     }>;

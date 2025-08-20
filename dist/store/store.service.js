@@ -26,7 +26,7 @@ let StoreService = class StoreService {
         const response = await this.httpService.axiosRef.get(url);
         return parseFloat(response.data.price);
     }
-    async buyCards(userId, dto) {
+    async buyCards(userId, dto, req) {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
         if (!user)
             throw new common_1.NotFoundException({
@@ -77,11 +77,13 @@ let StoreService = class StoreService {
                 time: new Date(),
             });
         }
+        const creator = await this.prisma.user.findUnique({ where: { id: req['user-id'] } });
         const order = await this.prisma.order.create({
             data: {
                 userId,
                 status: client_1.OrderStatus.PENDING,
-                createdBy: userId,
+                createdBy: creator?.email,
+                orderType: dto.orderType,
             },
         });
         const orderItems = await this.prisma.orderItems.createMany({
@@ -98,63 +100,9 @@ let StoreService = class StoreService {
             time: new Date(),
         };
     }
-    async orderPatch(data, id) {
-        try {
-            const one = await this.prisma.order.findUnique({
-                where: { id },
-            });
-            if (!one) {
-                throw new common_1.NotFoundException({
-                    data: [],
-                    messages: ['Order not found'],
-                    statusCode: 404,
-                    time: new Date(),
-                });
-            }
-            await this.prisma.order.update({
-                where: { id },
-                data: { read: data.read },
-            });
-            return {
-                data: [],
-                messages: ['Order updated'],
-                statusCode: 200,
-                time: new Date(),
-            };
-        }
-        catch (error) {
-            if (error != common_1.InternalServerErrorException) {
-                throw error;
-            }
-            console.log(error);
-            throw new common_1.InternalServerErrorException({ message: 'Server error' });
-        }
-    }
-    async myOrders(userId) {
-        const user = await this.prisma.user.findUnique({ where: { id: userId } });
-        if (!user)
-            throw new common_1.NotFoundException({
-                data: [],
-                messages: ['User not found'],
-                statusCode: 404,
-                time: new Date(),
-            });
-        if (user.verified === 0) {
-            throw new common_1.BadRequestException({
-                data: [],
-                messages: ['User has not verified'],
-                statusCode: 400,
-                time: new Date(),
-            });
-        }
+    async orders() {
         const all = await this.prisma.order.findMany({
-            where: {
-                userId,
-                NOT: {
-                    status: client_1.OrderStatus.ACCEPTED,
-                },
-            },
-            include: { items: { include: { videoCard: true } }, user: { select: { id: true, email: true } } },
+            include: { items: { include: { videoCard: true } }, user: { select: { id: true, email: true, role: true } } },
         });
         return {
             data: all,
@@ -167,7 +115,7 @@ let StoreService = class StoreService {
         try {
             const order = await this.prisma.order.findUnique({
                 where: { id },
-                include: { items: { include: { videoCard: true } }, user: { select: { id: true, email: true } } },
+                include: { items: { include: { videoCard: true } }, user: { select: { id: true, email: true, role: true } } },
             });
             if (!order) {
                 throw new common_1.NotFoundException({
@@ -180,7 +128,7 @@ let StoreService = class StoreService {
             if (data.status === client_1.OrderStatus.ACCEPTED) {
                 await this.prisma.order.update({
                     where: { id },
-                    data: { status: data.status },
+                    data: { status: client_1.OrderStatus.ACCEPTED, read: data.read },
                 });
                 const btcToUsdRate = await this.getBtcToUsdRate();
                 if (!btcToUsdRate || isNaN(btcToUsdRate)) {
@@ -226,7 +174,7 @@ let StoreService = class StoreService {
             if (data.status === client_1.OrderStatus.REJECTED) {
                 await this.prisma.order.update({
                     where: { id },
-                    data: { status: data.status, description: data.description },
+                    data: { status: client_1.OrderStatus.REJECTED, description: data.description, read: data.read },
                 });
                 return {
                     data: [],

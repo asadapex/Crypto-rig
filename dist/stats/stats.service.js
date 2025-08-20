@@ -171,6 +171,50 @@ let StatsService = class StatsService {
             statusCode: 200,
         };
     }
+    async calculateInvestment(dto) {
+        const { videoCardId, investment } = dto;
+        const device = await this.prisma.videoCard.findUnique({
+            where: { id: videoCardId },
+        });
+        if (!device) {
+            throw new common_1.NotFoundException({ data: [], messages: ['Device not found'], statusCode: 404, time: new Date() });
+        }
+        if (!device.price || !device.hashRate || !device.powerUsage) {
+            throw new common_1.BadRequestException({ data: [], messages: ['Device details not found'], statusCode: 400, time: new Date() });
+        }
+        if (investment < 1000) {
+            throw new common_1.BadRequestException({ data: [], messages: ['Minimal investment amount is $1000'], statusCode: 400, time: new Date() });
+        }
+        const [minHashRate, maxHashRate] = device.hashRate.split(' - ').map(num => parseFloat(num)) || [0, 0];
+        const [minPowerUsage, maxPowerUsage] = device.powerUsage.split(' - ').map(num => parseFloat(num)) || [0, 0];
+        const avgHashRate = (minHashRate + maxHashRate) / 2 || 0;
+        const avgPowerUsage = (minPowerUsage + maxPowerUsage) / 2 || 0;
+        if (isNaN(avgHashRate) || isNaN(avgPowerUsage)) {
+            throw new common_1.BadRequestException({ data: [], messages: ['Hashrate or power usage is not in the correct format'], statusCode: 400, time: new Date() });
+        }
+        const btcPrice = 60000;
+        const electricityCost = 0.05;
+        const dailyProfitPerUnit = 0.002;
+        const dailyPowerCostPerUnit = (avgPowerUsage * 24) / 1000 * electricityCost;
+        const units = Math.floor(investment / device.price);
+        if (units === 0) {
+            throw new common_1.BadRequestException({ data: [], messages: ['Investment amount is less than the price of one video card'], statusCode: 400, time: new Date() });
+        }
+        let totalDailyBtc = dailyProfitPerUnit * units;
+        let totalDailyIncome = (totalDailyBtc * btcPrice) - (dailyPowerCostPerUnit * units);
+        totalDailyIncome = totalDailyIncome * 0.040;
+        const monthlyIncome = totalDailyIncome * 30;
+        return {
+            data: {
+                videoCard: device.model,
+                units,
+                dailyIncome: Number(totalDailyIncome.toFixed(2)),
+                monthlyIncome: Number(monthlyIncome.toFixed(2)),
+            },
+            messages: [],
+            statusCode: 200,
+        };
+    }
 };
 exports.StatsService = StatsService;
 exports.StatsService = StatsService = __decorate([
